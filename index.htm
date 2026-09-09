@@ -233,8 +233,18 @@
             </form>
         </div>
 
+        <!-- 4. Halaman Lihat Data Saya -->
+        <div id="dataPage" class="card hidden">
+            <h3 style="color: var(--text-color); margin-bottom: 15px;">Riwayat Data Kaporlap</h3>
+            <div id="dataContainer">
+                <p style="text-align: center; color: #666;">Memuat data...</p>
+            </div>
+            <button type="button" class="btn btn-outline" style="margin-top: 15px;" onclick="showMenu()">KEMBALI KE MENU</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE SCRIPT ANDA
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxV_zOwVnaWIxrHkQ7ThhHT6RbJBiwQ22JXkat_plVAcqod2aQXxP0-pkPSYg07LrbO/exec";
 
     let currentSession = {
@@ -300,13 +310,16 @@
     function showMenu() {
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('formPage').classList.add('hidden');
+        document.getElementById('dataPage').classList.add('hidden');
         document.getElementById('mainMenu').classList.remove('hidden');
     }
 
     function showForm() {
         document.getElementById('mainMenu').classList.add('hidden');
         document.getElementById('formPage').classList.remove('hidden');
+        document.getElementById('dataPage').classList.add('hidden');
     }
+
     // Fungsi untuk mengambil data spesifik prajurit yang sedang login
     function loadMyData() {
         showDataPage();
@@ -323,7 +336,7 @@
         .then(res => res.json())
         .then(response => {
             if (response.status === 'success') {
-                if (response.data.length === 0) {
+                if (!response.data || response.data.length === 0) {
                     container.innerHTML = '<p style="text-align: center; color: #888;">Belum ada riwayat data kaporlap yang diisi.</p>';
                     return;
                 }
@@ -363,18 +376,12 @@
         document.getElementById('dataPage').classList.remove('hidden');
     }
 
-    function showMenu() {
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('formPage').classList.add('hidden');
-        document.getElementById('dataPage').classList.add('hidden');
-        document.getElementById('mainMenu').classList.remove('hidden');
-    }
-
     function logout() {
         currentSession = { nrp: "", nama: "" };
         document.getElementById('userInfo').innerText = 'Aplikasi Internal Anggota';
         document.getElementById('mainMenu').classList.add('hidden');
         document.getElementById('formPage').classList.add('hidden');
+        document.getElementById('dataPage').classList.add('hidden');
         document.getElementById('loginPage').classList.remove('hidden');
     }
 </script>
