@@ -307,6 +307,68 @@
         document.getElementById('mainMenu').classList.add('hidden');
         document.getElementById('formPage').classList.remove('hidden');
     }
+    // Fungsi untuk mengambil data spesifik prajurit yang sedang login
+    function loadMyData() {
+        showDataPage();
+        const container = document.getElementById('dataContainer');
+        container.innerHTML = '<p style="text-align: center; color: #666;">Memuat data...</p>';
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'get_my_data',
+                nrp: currentSession.nrp
+            })
+        })
+        .then(res => res.json())
+        .then(response => {
+            if (response.status === 'success') {
+                if (response.data.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #888;">Belum ada riwayat data kaporlap yang diisi.</p>';
+                    return;
+                }
+
+                let html = '';
+                response.data.forEach((item, index) => {
+                    html += `
+                        <div style="border: 1px solid #90E0EF; border-radius: 8px; padding: 12px; margin-bottom: 12px; background-color: #F0F9FF;">
+                            <div style="font-size: 0.8rem; color: #0077B6; font-weight: bold; margin-bottom: 8px;">
+                                📅 Waktu Input: ${item.timestamp} ${index === 0 ? '<span style="background:#00A8FF; color:white; padding:2px 6px; border-radius:4px; font-size:0.7rem;">Terbaru</span>' : ''}
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.9rem;">
+                                <div><strong>Pangkat:</strong> ${item.pangkat}</div>
+                                <div><strong>Ukuran PDL:</strong> ${item.ukuranPDL}</div>
+                                <div><strong>Ukuran Sepatu:</strong> ${item.ukuranSepatu}</div>
+                                <div><strong>Ukuran Topi:</strong> ${item.ukuranTopi}</div>
+                                <div><strong>Sepatu Olahraga:</strong> ${item.ukuranSepatuOlahraga}</div>
+                                <div><strong>Ukuran PDHS:</strong> ${item.ukuranPDHS}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p style="color: red; text-align: center;">Gagal mengambil data.</p>';
+            }
+        })
+        .catch(err => {
+            container.innerHTML = '<p style="color: red; text-align: center;">Koneksi terganggu!</p>';
+        });
+    }
+
+    function showDataPage() {
+        document.getElementById('mainMenu').classList.add('hidden');
+        document.getElementById('formPage').classList.add('hidden');
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('dataPage').classList.remove('hidden');
+    }
+
+    function showMenu() {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('formPage').classList.add('hidden');
+        document.getElementById('dataPage').classList.add('hidden');
+        document.getElementById('mainMenu').classList.remove('hidden');
+    }
 
     function logout() {
         currentSession = { nrp: "", nama: "" };
