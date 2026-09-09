@@ -324,7 +324,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBMAExsR7DdVSkAHxDYSVw-jmfMOckJnErWfzv5AtX-a7xc89hXLXpsumNV_kyV6bn/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYuK7SZWFMkGXzFIrqoUemTdSZbIQ3j35wwgApvxUP6GdnH1QUVvgPkt4T_SImrIef/exec";
 
     let currentSession = { nrp: "", nama: "", role: "" };
     let allAdminData = [];
@@ -642,7 +642,7 @@
         try {
             const res = await postToAppsScript({ action: 'get_my_data', nrp: currentSession.nrp });
             if (res.status === 'success') {
-                const st = res.statusInfo;
+                const st = res.statusInfo || { status: 'Belum Diambil', tglDiambil: '-', petugas: '-' };
                 statusContainer.innerHTML = `
                     <div style="padding: 12px; border-radius: 8px; background: #E8F5E9; border: 1px solid #A5D6A7;">
                         <div style="font-size:0.85rem;">Progres Pengambilan Overall:</div>
@@ -668,87 +668,84 @@
                     const takenItems = res.itemsTaken || [];
                     const availableItems = res.availableItems || [];
 
-                    let html = '<div class="item-status-grid">';
+                    let html = `<div class="item-status-grid">`;
+                    listItems.forEach(item => {
+                        const isTaken = takenItems.includes(item.key);
+                        const isAvailable = availableItems.includes(item.key);
 
-                    listItems.forEach((item) => {
-                        let statusLabel = '';
-                        let badgeClass = '';
-
-                        if (takenItems.includes(item.key)) {
-                            statusLabel = 'Sudah Diambil';
-                            badgeClass = 'badge-taken';
-                        } else if (availableItems.includes(item.key)) {
-                            statusLabel = 'Sudah Tersedia';
-                            badgeClass = 'badge-ready';
+                        let badgeHtml = '';
+                        if (isTaken) {
+                            badgeHtml = `<span class="status-badge badge-taken">Sudah Diambil</span>`;
+                        } else if (isAvailable) {
+                            badgeHtml = `<span class="status-badge badge-ready">Siap Diambil</span>`;
                         } else {
-                            statusLabel = 'Belum Tersedia';
-                            badgeClass = 'badge-pending';
+                            badgeHtml = `<span class="status-badge badge-pending">Belum Tersedia</span>`;
                         }
 
                         html += `
                             <div class="item-status-card">
                                 <div>
-                                    <strong style="font-size:0.85rem; color: var(--text-color);">${item.key}</strong>
-                                    <div style="font-size:0.75rem; color:#666;">Ukuran: ${item.size || '-'}</div>
+                                    <div style="font-weight:bold; font-size:0.85rem; color:var(--text-color);">${item.key}</div>
+                                    <div style="font-size:0.75rem; color:#666;">Ukuran: <strong>${item.size || '-'}</strong></div>
                                 </div>
-                                <span class="status-badge ${badgeClass}">${statusLabel}</span>
+                                <div>${badgeHtml}</div>
                             </div>
                         `;
                     });
-
-                    html += '</div>';
+                    html += `</div>`;
                     container.innerHTML = html;
                 } else {
-                    container.innerHTML = '<p style="text-align:center; color:#888;">Belum ada data ukuran tersimpan.</p>';
+                    container.innerHTML = '<p style="text-align:center; color:#666;">Belum ada data ukuran yang dimasukkan.</p>';
                 }
+            } else {
+                container.innerHTML = '<p style="text-align:center; color:red;">Gagal mengambil data saya.</p>';
             }
         } catch (err) {
-            container.innerHTML = '<p style="text-align:center; color:red;">Gagal memuat data.</p>';
+            container.innerHTML = '<p style="text-align:center; color:red;">Gagal terhubung ke server.</p>';
         }
-    }
-
-    function setButtonLoading(button, isLoading, textLoading = 'Memproses...') {
-        if (!button) return;
-        if (isLoading) {
-            button.dataset.originalText = button.innerHTML;
-            button.classList.add('btn-loading');
-            button.disabled = true;
-            button.innerHTML = `<span class="spinner"></span> <span>${textLoading}</span>`;
-        } else {
-            button.classList.remove('btn-loading');
-            button.disabled = false;
-            if (button.dataset.originalText) button.innerHTML = button.dataset.originalText;
-        }
-    }
-
-    function showDisplayPage() {
-        document.getElementById('mainMenu').classList.add('hidden');
-        document.getElementById('formPage').classList.add('hidden');
-        document.getElementById('dataPage').classList.remove('hidden');
     }
 
     function showMenu() {
-        document.getElementById('loginCard').classList.add('hidden');
-        document.getElementById('adminPanel').classList.add('hidden');
-        document.getElementById('formPage').classList.add('hidden');
-        document.getElementById('dataPage').classList.add('hidden');
+        hideAllPages();
         document.getElementById('mainMenu').classList.remove('hidden');
     }
 
     function showForm() {
-        document.getElementById('mainMenu').classList.add('hidden');
+        hideAllPages();
         document.getElementById('formPage').classList.remove('hidden');
+    }
+
+    function showDisplayPage() {
+        hideAllPages();
+        document.getElementById('dataPage').classList.remove('hidden');
+    }
+
+    function hideAllPages() {
+        document.getElementById('loginCard').classList.add('hidden');
+        document.getElementById('adminPanel').classList.add('hidden');
+        document.getElementById('mainMenu').classList.add('hidden');
+        document.getElementById('formPage').classList.add('hidden');
+        document.getElementById('dataPage').classList.add('hidden');
     }
 
     function logout() {
         currentSession = { nrp: "", nama: "", role: "" };
-        document.getElementById('userInfo').innerText = 'Aplikasi Internal Denma Paspampres';
-        document.getElementById('mainMenu').classList.add('hidden');
-        document.getElementById('adminPanel').classList.add('hidden');
-        document.getElementById('formPage').classList.add('hidden');
-        document.getElementById('dataPage').classList.add('hidden');
-        document.getElementById('loginCard').classList.remove('hidden');
         document.getElementById('loginForm').reset();
+        document.getElementById('userInfo').innerText = 'Aplikasi Internal Denma Paspampres';
+        hideAllPages();
+        document.getElementById('loginCard').classList.remove('hidden');
+        showToast('Anda telah keluar.', 'info');
+    }
+
+    function setButtonLoading(btn, isLoading, text = '') {
+        if (isLoading) {
+            btn.dataset.originalText = btn.innerText;
+            btn.classList.add('btn-loading');
+            btn.innerHTML = `<span class="spinner"></span> ${text}`;
+        } else {
+            btn.classList.remove('btn-loading');
+            btn.innerText = btn.dataset.originalText || 'SIMPAN';
+        }
     }
 
     function showToast(message, type = 'info') {
@@ -757,6 +754,7 @@
         toast.className = `toast toast-${type}`;
         toast.innerText = message;
         container.appendChild(toast);
+
         setTimeout(() => toast.classList.add('show'), 10);
         setTimeout(() => {
             toast.classList.remove('show');
