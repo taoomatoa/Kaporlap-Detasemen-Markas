@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pendataan Kaporlap</title>
+    <style>
+        :root {
+            --primary-color: #00A8FF;
+            --secondary-color: #0077B6;
+            --bg-color: #E0F7FA;
+            --card-bg: #FFFFFF;
+            --text-color: #023E8A;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            background-color: var(--card-bg);
+            min-height: 100vh;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .header h2 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .content {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #BEE3F8;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #90E0EF;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(0, 168, 255, 0.4);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            margin-top: 10px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .menu-item {
+            background: #E0F7FA;
+            border: 1px solid #90E0EF;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .user-info {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container">
+    <!-- Header -->
+    <div class="header">
+        <h2>PENDATAAN KAPORLAP</h2>
+        <div id="userInfo" class="user-info">Aplikasi Internal Anggota</div>
+    </div>
+
+    <div class="content">
+        <!-- 1. Halaman Login -->
+        <div id="loginPage" class="card">
+            <h3 style="color: var(--text-color); margin-bottom: 15px; text-align: center;">Masuk Anggota</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>NRP / NIK</label>
+                    <input type="text" id="loginNrp" class="form-control" placeholder="Masukkan NRP" required>
+                </div>
+                <div class="form-group">
+                    <label>Kata Sandi</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan Password" required>
+                </div>
+                <button type="submit" class="btn">MASUK</button>
+            </form>
+        </div>
+
+        <!-- 2. Menu Utama -->
+        <div id="mainMenu" class="hidden">
+            <div class="menu-grid">
+                <div class="menu-item" onclick="showForm()">
+                    <div>👕</div>
+                    <div>Input / Edit Ukuran</div>
+                </div>
+                <div class="menu-item" onclick="alert('Fitur riwayat data dapat disesuaikan kebutuhan.')">
+                    <div>📋</div>
+                    <div>Lihat Data Saya</div>
+                </div>
+            </div>
+            <button class="btn btn-outline" onclick="logout()">Keluar (Logout)</button>
+        </div>
+
+        <!-- 3. Formulir Isian Ukuran -->
+        <div id="formPage" class="card hidden">
+            <h3 style="color: var(--text-color); margin-bottom: 15px;">Formulir Ukuran Kaporlap</h3>
+            <form id="kaporlapForm">
+                <div class="form-group">
+                    <label>Pangkat</label>
+                    <input type="text" id="pangkat" class="form-control" placeholder="Contoh: Serda / Sertu / Kapten" required>
+                </div>
+                <div class="form-group">
+                    <label>Ukuran PDL</label>
+                    <select id="ukuranPDL" class="form-control" required>
+                        <option value="">-- Pilih Ukuran --</option>
+                        <option value="K">K (Kecil)</option>
+                        <option value="S">S (Sedang)</option>
+                        <option value="B">B (Besar)</option>
+                        <option value="EB">EB (Ekstra Besar)</option>
+                        <option value="EEB">EEB (Ekstra-Ekstra Besar)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ukuran Sepatu PDL</label>
+                    <input type="number" id="ukuranSepatu" class="form-control" min="38" max="47" placeholder="Contoh: 42" required>
+                </div>
+                <div class="form-group">
+                    <label>Ukuran Topi / Pet / Baret</label>
+                    <input type="number" id="ukuranTopi" class="form-control" min="53" max="62" placeholder="Contoh: 57" required>
+                </div>
+                <div class="form-group">
+                    <label>Ukuran Sepatu Olah Raga</label>
+                    <input type="number" id="ukuranSepatuOlahraga" class="form-control" min="38" max="47" placeholder="Contoh: 42" required>
+                </div>
+                <div class="form-group">
+                    <label>Ukuran PDHS / Pakaian Dinas</label>
+                    <select id="ukuranPDHS" class="form-control" required>
+                        <option value="">-- Pilih Ukuran --</option>
+                        <option value="K">K (Kecil)</option>
+                        <option value="S">S (Sedang)</option>
+                        <option value="B">B (Besar)</option>
+                        <option value="EB">EB (Ekstra Besar)</option>
+                        <option value="EEB">EEB (Ekstra-Ekstra Besar)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">SIMPAN DATA</button>
+                <button type="button" class="btn btn-outline" onclick="showMenu()">KEMBALI</button>
+            </form>
+        </div>
+
+<script>
+    // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE SCRIPT ANDA
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY4JJ_-CXeOg8XuOnihtMptp3J9hRVCQxfW2pgfHpmI7JhUeGo6XzExl2S_TLnsFgR/exec";
+
+    let currentSession = {
+        nrp: "",
+        nama: ""
+    };
+
+    // Handle Login
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const nrp = document.getElementById('loginNrp').value;
+        const password = document.getElementById('loginPassword').value;
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'login', nrp: nrp, password: password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                currentSession.nrp = nrp;
+                currentSession.nama = data.nama;
+                document.getElementById('userInfo').innerText = `Prajurit: ${data.nama} (${nrp})`;
+                showMenu();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(err => alert('Gagal terhubung ke server!'));
+    });
+
+    // Handle Simpan Data Kaporlap
+    document.getElementById('kaporlapForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const payload = {
+            action: 'simpan_kaporlap',
+            nrp: currentSession.nrp,
+            nama: currentSession.nama,
+            pangkat: document.getElementById('pangkat').value,
+            ukuranPDL: document.getElementById('ukuranPDL').value,
+            ukuranSepatu: document.getElementById('ukuranSepatu').value,
+            ukuranTopi: document.getElementById('ukuranTopi').value,
+            jenisSabuk: document.getElementById('jenisSabuk').value,
+            atribut: document.getElementById('atribut').value
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if (data.status === 'success') {
+                showMenu();
+            }
+        })
+        .catch(err => alert('Gagal menyimpan data!'));
+    });
+
+    function showMenu() {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('formPage').classList.add('hidden');
+        document.getElementById('mainMenu').classList.remove('hidden');
+    }
+
+    function showForm() {
+        document.getElementById('mainMenu').classList.add('hidden');
+        document.getElementById('formPage').classList.remove('hidden');
+    }
+
+    function logout() {
+        currentSession = { nrp: "", nama: "" };
+        document.getElementById('userInfo').innerText = 'Aplikasi Internal Anggota';
+        document.getElementById('mainMenu').classList.add('hidden');
+        document.getElementById('formPage').classList.add('hidden');
+        document.getElementById('loginPage').classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>
