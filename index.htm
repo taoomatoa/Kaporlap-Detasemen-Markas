@@ -11,6 +11,8 @@
             --bg-color: #E0F7FA;
             --card-bg: #FFFFFF;
             --text-color: #023E8A;
+            --alert-color: #FF9F1C;
+            --success-color: #2EC4B6;
         }
 
         * {
@@ -88,11 +90,6 @@
             outline: none;
         }
 
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 5px rgba(0, 168, 255, 0.4);
-        }
-
         .btn {
             width: 100%;
             padding: 12px;
@@ -120,18 +117,31 @@
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
         }
 
         .menu-item {
             background: #E0F7FA;
             border: 1px solid #90E0EF;
-            padding: 20px;
+            padding: 15px 10px;
             border-radius: 12px;
             text-align: center;
             cursor: pointer;
             color: var(--text-color);
             font-weight: bold;
+            font-size: 0.85rem;
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: red;
+            color: white;
+            font-size: 0.75rem;
+            border-radius: 50%;
+            padding: 2px 6px;
         }
 
         .hidden {
@@ -147,14 +157,13 @@
 <body>
 
 <div class="mobile-container">
-    <!-- Header -->
     <div class="header">
         <h2>PENDATAAN KAPORLAP</h2>
-        <div id="userInfo" class="user-info">Aplikasi Internal Anggota</div>
+        <div id="userInfo" class="user-info">Aplikasi Internal Denma Paspampres</div>
     </div>
 
     <div class="content">
-        <!-- 1. Halaman Login -->
+        <!-- 1. Login -->
         <div id="loginPage" class="card">
             <h3 style="color: var(--text-color); margin-bottom: 15px; text-align: center;">Masuk Anggota</h3>
             <form id="loginForm">
@@ -174,18 +183,27 @@
         <div id="mainMenu" class="hidden">
             <div class="menu-grid">
                 <div class="menu-item" onclick="showForm()">
-                    <div>👕</div>
-                    <div>Input / Edit Ukuran</div>
+                    <div style="font-size: 1.5rem;">👕</div>
+                    <div>Input Ukuran</div>
                 </div>
                 <div class="menu-item" onclick="loadMyData()">
-                    <div>📋</div>
-                    <div>Lihat Data Saya</div>
+                    <div style="font-size: 1.5rem;">📋</div>
+                    <div>Lihat Ukuran Saya</div>
+                </div>
+                <div class="menu-item" onclick="loadKaporlapSiap()" style="border-color: var(--alert-color); background: #FFF9EC;">
+                    <div style="font-size: 1.5rem;">📦</div>
+                    <div>Siap Diambil</div>
+                    <span id="badgeSiap" class="badge hidden">0</span>
+                </div>
+                <div class="menu-item" onclick="loadKaporlapDiambil()" style="border-color: var(--success-color); background: #E8FAF8;">
+                    <div style="font-size: 1.5rem;">✅</div>
+                    <div>Telah Diambil</div>
                 </div>
             </div>
-            <button class="btn btn-outline" onclick="logout()">Keluar (Logout)</button>
+            <button class="btn btn-outline" style="margin-top:20px;" onclick="logout()">Keluar (Logout)</button>
         </div>
 
-        <!-- 3. Formulir Isian Ukuran -->
+        <!-- 3. Form Input -->
         <div id="formPage" class="card hidden">
             <h3 style="color: var(--text-color); margin-bottom: 15px;">Formulir Ukuran Kaporlap</h3>
             <form id="kaporlapForm">
@@ -225,7 +243,6 @@
                         <option value="L">L (Besar)</option>
                         <option value="XL">XL (Ekstra Besar)</option>
                         <option value="XXL">XXL (Ekstra-Ekstra Besar)</option>
-                        <option value="XXXL">XXXL (Ekstra-Ekstra-Ekstra Besar)</option>
                     </select>
                 </div>
                 <button type="submit" class="btn">SIMPAN DATA</button>
@@ -233,9 +250,9 @@
             </form>
         </div>
 
-        <!-- 4. Halaman Lihat Data Saya -->
+        <!-- 4. Halaman Display Universal -->
         <div id="dataPage" class="card hidden">
-            <h3 style="color: var(--text-color); margin-bottom: 15px;">Riwayat Data Kaporlap</h3>
+            <h3 id="pageTitle" style="color: var(--text-color); margin-bottom: 15px;">Riwayat Data</h3>
             <div id="dataContainer">
                 <p style="text-align: center; color: #666;">Memuat data...</p>
             </div>
@@ -247,12 +264,9 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxV_zOwVnaWIxrHkQ7ThhHT6RbJBiwQ22JXkat_plVAcqod2aQXxP0-pkPSYg07LrbO/exec";
 
-    let currentSession = {
-        nrp: "",
-        nama: ""
-    };
+    let currentSession = { nrp: "", nama: "" };
 
-    // Handle Login
+    // Login
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const nrp = document.getElementById('loginNrp').value;
@@ -269,6 +283,7 @@
                 currentSession.nama = data.nama;
                 document.getElementById('userInfo').innerText = `Prajurit: ${data.nama} (${nrp})`;
                 showMenu();
+                checkBadgeSiap();
             } else {
                 alert(data.message);
             }
@@ -276,10 +291,9 @@
         .catch(err => alert('Gagal terhubung ke server!'));
     });
 
-    // Handle Simpan Data Kaporlap
+    // Simpan
     document.getElementById('kaporlapForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        
         const payload = {
             action: 'simpan_kaporlap',
             nrp: currentSession.nrp,
@@ -292,10 +306,7 @@
             ukuranPDHS: document.getElementById('ukuranPDHS').value
         };
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        })
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
         .then(res => res.json())
         .then(data => {
             alert(data.message);
@@ -303,9 +314,110 @@
                 document.getElementById('kaporlapForm').reset();
                 showMenu();
             }
-        })
-        .catch(err => alert('Gagal menyimpan data! Periksa koneksi internet Anda.'));
+        });
     });
+
+    // Cek Notifikasi Badge Siap Diambil
+    function checkBadgeSiap() {
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'get_kaporlap_siap', nrp: currentSession.nrp })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success' && res.data.length > 0) {
+                const badge = document.getElementById('badgeSiap');
+                badge.innerText = res.data.length;
+                badge.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Load Data Ukuran
+    function loadMyData() {
+        showDisplayPage('Ukuran Saya');
+        const container = document.getElementById('dataContainer');
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'get_my_data', nrp: currentSession.nrp }) })
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success' && res.data.length > 0) {
+                let html = '';
+                res.data.forEach((item) => {
+                    html += `
+                        <div style="border: 1px solid #90E0EF; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F0F9FF;">
+                            <div style="font-size:0.8rem; color:#0077B6; font-weight:bold;">📅 ${item.timestamp}</div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.85rem; margin-top:8px;">
+                                <div><strong>Pangkat:</strong> ${item.pangkat}</div>
+                                <div><strong>PDL:</strong> ${item.ukuranPDL}</div>
+                                <div><strong>Sepatu PDL:</strong> ${item.ukuranSepatu}</div>
+                                <div><strong>Topi:</strong> ${item.ukuranTopi}</div>
+                                <div><strong>Sepatu OR:</strong> ${item.ukuranSepatuOlahraga}</div>
+                                <div><strong>PDHS:</strong> ${item.ukuranPDHS}</div>
+                            </div>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p style="text-align:center; color:#888;">Belum ada data ukuran.</p>';
+            }
+        });
+    }
+
+    // Load Kaporlap Siap Diambil
+    function loadKaporlapSiap() {
+        showDisplayPage('Kaporlap Siap Diambil');
+        const container = document.getElementById('dataContainer');
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'get_kaporlap_siap', nrp: currentSession.nrp }) })
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success' && res.data.length > 0) {
+                let html = '';
+                res.data.forEach((item) => {
+                    html += `
+                        <div style="border: 1px solid #FF9F1C; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #FFF9EC;">
+                            <div style="color: #D47A00; font-weight: bold;">📦 ${item.barang}</div>
+                            <div style="font-size: 0.85rem; margin-top: 5px;"><strong>Lokasi Ambil:</strong> ${item.lokasi}</div>
+                            <div style="font-size: 0.75rem; color: #888; margin-top: 5px;">Siap sejak: ${item.timestamp}</div>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p style="text-align:center; color:#888;">Tidak ada kaporlap yang siap diambil saat ini.</p>';
+            }
+        });
+    }
+
+    // Load Kaporlap Telah Diambil
+    function loadKaporlapDiambil() {
+        showDisplayPage('Riwayat Kaporlap Diambil');
+        const container = document.getElementById('dataContainer');
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'get_kaporlap_diambil', nrp: currentSession.nrp }) })
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success' && res.data.length > 0) {
+                let html = '';
+                res.data.forEach((item) => {
+                    html += `
+                        <div style="border: 1px solid #2EC4B6; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #E8FAF8;">
+                            <div style="color: #0E8074; font-weight: bold;">✅ ${item.barang}</div>
+                            <div style="font-size: 0.85rem; margin-top: 5px;"><strong>Petugas Penyerah:</strong> ${item.petugas}</div>
+                            <div style="font-size: 0.75rem; color: #888; margin-top: 5px;">Diambil pada: ${item.timestamp}</div>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p style="text-align:center; color:#888;">Belum ada riwayat pengambilan.</p>';
+            }
+        });
+    }
+
+    function showDisplayPage(title) {
+        document.getElementById('pageTitle').innerText = title;
+        document.getElementById('dataContainer').innerHTML = '<p style="text-align:center; color:#666;">Memuat data...</p>';
+        document.getElementById('mainMenu').classList.add('hidden');
+        document.getElementById('formPage').classList.add('hidden');
+        document.getElementById('dataPage').classList.remove('hidden');
+    }
 
     function showMenu() {
         document.getElementById('loginPage').classList.add('hidden');
@@ -317,68 +429,12 @@
     function showForm() {
         document.getElementById('mainMenu').classList.add('hidden');
         document.getElementById('formPage').classList.remove('hidden');
-        document.getElementById('dataPage').classList.add('hidden');
-    }
-
-    // Fungsi untuk mengambil data spesifik prajurit yang sedang login
-    function loadMyData() {
-        showDataPage();
-        const container = document.getElementById('dataContainer');
-        container.innerHTML = '<p style="text-align: center; color: #666;">Memuat data...</p>';
-
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-                action: 'get_my_data',
-                nrp: currentSession.nrp
-            })
-        })
-        .then(res => res.json())
-        .then(response => {
-            if (response.status === 'success') {
-                if (!response.data || response.data.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; color: #888;">Belum ada riwayat data kaporlap yang diisi.</p>';
-                    return;
-                }
-
-                let html = '';
-                response.data.forEach((item, index) => {
-                    html += `
-                        <div style="border: 1px solid #90E0EF; border-radius: 8px; padding: 12px; margin-bottom: 12px; background-color: #F0F9FF;">
-                            <div style="font-size: 0.8rem; color: #0077B6; font-weight: bold; margin-bottom: 8px;">
-                                📅 Waktu Input: ${item.timestamp} ${index === 0 ? '<span style="background:#00A8FF; color:white; padding:2px 6px; border-radius:4px; font-size:0.7rem;">Terbaru</span>' : ''}
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.9rem;">
-                                <div><strong>Pangkat:</strong> ${item.pangkat}</div>
-                                <div><strong>Ukuran PDL:</strong> ${item.ukuranPDL}</div>
-                                <div><strong>Ukuran Sepatu:</strong> ${item.ukuranSepatu}</div>
-                                <div><strong>Ukuran Topi:</strong> ${item.ukuranTopi}</div>
-                                <div><strong>Sepatu Olahraga:</strong> ${item.ukuranSepatuOlahraga}</div>
-                                <div><strong>Ukuran PDHS:</strong> ${item.ukuranPDHS}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<p style="color: red; text-align: center;">Gagal mengambil data.</p>';
-            }
-        })
-        .catch(err => {
-            container.innerHTML = '<p style="color: red; text-align: center;">Koneksi terganggu!</p>';
-        });
-    }
-
-    function showDataPage() {
-        document.getElementById('mainMenu').classList.add('hidden');
-        document.getElementById('formPage').classList.add('hidden');
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('dataPage').classList.remove('hidden');
     }
 
     function logout() {
         currentSession = { nrp: "", nama: "" };
         document.getElementById('userInfo').innerText = 'Aplikasi Internal Anggota';
+        document.getElementById('badgeSiap').classList.add('hidden');
         document.getElementById('mainMenu').classList.add('hidden');
         document.getElementById('formPage').classList.add('hidden');
         document.getElementById('dataPage').classList.add('hidden');
