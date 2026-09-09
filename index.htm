@@ -247,20 +247,31 @@
     </div>
 
     <div class="content">
-        <!-- 1. Login -->
-        <div id="loginPage" class="card">
-            <h3 style="color: var(--text-color); margin-bottom: 15px; text-align: center;">Masuk Anggota</h3>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="loginNrp">NRP / NIK</label>
-                    <input type="text" id="loginNrp" class="form-control" placeholder="Masukkan NRP" required>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Kata Sandi</label>
-                    <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan Password" required>
-                </div>
-                <button type="submit" class="btn">MASUK</button>
-            </form>
+        <!-- Form Login -->
+        <div id="loginCard" class="card">
+          <h2>Login Sistem Kaporlap</h2>
+          <div class="form-group">
+            <label>Username / NRP</label>
+            <input type="text" id="username" placeholder="Masukkan NRP">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Masukkan Password">
+          </div>
+          <button id="btnLogin" onclick="login()">Login</button>
+        </div>
+        
+        <!-- Dashboard Admin (Hanya tampil jika Role = Admin) -->
+        <div id="adminPanel" class="card" style="display: none;">
+          <h2>Dashboard Monitoring Admin</h2>
+          <div class="tab-menu">
+            <button onclick="switchTab('sudah')">Sudah Mengambil</button>
+            <button onclick="switchTab('belum')">Belum Mengambil</button>
+          </div>
+          
+          <div id="tableContainer">
+            <!-- Tabel rekapitulasi dipanggil lewat JS -->
+          </div>
         </div>
 
         <!-- 2. Menu Utama -->
@@ -393,6 +404,40 @@
         } finally {
             setButtonLoading(submitBtn, false);
         }
+    }
+
+    let currentUser = null;
+
+    async function login() {
+      const userVal = document.getElementById('username').value;
+      const passVal = document.getElementById('password').value;
+    
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'login',
+          username: userVal,
+          password: passVal
+        })
+      });
+    
+      const result = await response.json();
+    
+      if (result.status === 'success') {
+        currentUser = result;
+        document.getElementById('loginCard').style.display = 'none';
+    
+        if (result.role === 'Admin') {
+          // Tampilkan Fitur Admin
+          document.getElementById('adminPanel').style.display = 'block';
+          loadRekapData(); // Load tabel rekap mengambil/belum
+        } else {
+          // Tampilkan Form Input Kaporlap (User/Prajurit biasa)
+          document.getElementById('formKaporlap').style.display = 'block';
+        }
+      } else {
+        showToast(result.message, 'error');
+      }
     }
 
     // Handle Simpan Ukuran Async
