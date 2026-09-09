@@ -15,50 +15,27 @@
             --danger-color: #c62828;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
 
         .mobile-container {
-            width: 100%;
-            max-width: 480px;
-            background-color: var(--card-bg);
-            min-height: 100vh;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
+            width: 100%; max-width: 480px; background-color: var(--card-bg);
+            min-height: 100vh; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; position: relative;
         }
 
         .header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
+            color: white; padding: 20px; text-align: center;
+            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
         }
 
         .header h2 { font-size: 1.2rem; margin-bottom: 5px; }
         .content { padding: 20px; flex: 1; }
 
         .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid #BEE3F8;
-            margin-bottom: 15px;
+            background: white; padding: 20px; border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #BEE3F8; margin-bottom: 15px;
         }
 
         .form-group { margin-bottom: 15px; }
@@ -66,16 +43,9 @@
         .form-control { width: 100%; padding: 12px; border: 1px solid #90E0EF; border-radius: 8px; font-size: 0.95rem; outline: none; }
 
         .btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
+            width: 100%; padding: 12px; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px; font-size: 0.95rem;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
         }
 
         .btn-sm { padding: 6px 12px; font-size: 0.8rem; width: auto; }
@@ -85,82 +55,44 @@
 
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .menu-item {
-            background: #E0F7FA;
-            border: 1px solid #90E0EF;
-            padding: 15px 10px;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            color: var(--text-color);
-            font-weight: bold;
-            font-size: 0.85rem;
+            background: #E0F7FA; border: 1px solid #90E0EF; padding: 15px 10px;
+            border-radius: 12px; text-align: center; cursor: pointer;
+            color: var(--text-color); font-weight: bold; font-size: 0.85rem;
         }
 
         .tab-menu { display: flex; gap: 8px; margin-bottom: 15px; }
         .tab-menu button {
-            flex: 1;
-            padding: 10px 5px;
-            border: 1px solid var(--primary-color);
-            background: white;
-            color: var(--primary-color);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: bold;
+            flex: 1; padding: 10px 5px; border: 1px solid var(--primary-color);
+            background: white; color: var(--primary-color); border-radius: 6px;
+            cursor: pointer; font-size: 0.85rem; font-weight: bold;
         }
         .tab-menu button.active { background: var(--primary-color); color: white; }
 
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: white;
-        }
+        .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; color: white; }
         .badge-success { background-color: var(--success-color); }
         .badge-danger { background-color: var(--danger-color); }
 
         .hidden { display: none !important; }
         .user-info { font-size: 0.85rem; opacity: 0.9; }
 
-        /* Kartu Daftar Anggota Admin */
         .member-card {
-            border: 1px solid #E0E0E0;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            background: #FAFAFA;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border: 1px solid #E0E0E0; border-radius: 8px; padding: 12px;
+            margin-bottom: 10px; background: #FAFAFA; display: flex;
+            flex-direction: column; gap: 8px;
         }
 
+        /* Modal Checklist Overlay */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center;
+            align-items: center; z-index: 999;
+        }
+        .modal-body { width: 90%; max-width: 400px; }
+
         /* Loading Spinner */
-        .btn-loading {
-            position: relative;
-            pointer-events: none;
-            opacity: 0.8;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .btn-loading { position: relative; pointer-events: none; opacity: 0.8; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: #ffffff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Toast Notification */
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; max-width: 380px; width: calc(100% - 40px); }
@@ -182,7 +114,7 @@
     </div>
 
     <div class="content">
-        <!-- 1. Form Login -->
+        <!-- 1. LOGIN -->
         <div id="loginCard" class="card">
             <h3 style="color: var(--text-color); margin-bottom: 15px; text-align: center;">Login Sistem</h3>
             <form id="loginForm">
@@ -198,7 +130,7 @@
             </form>
         </div>
         
-        <!-- 2. DASHBOARD ADMIN (Pencarian & Refresh) -->
+        <!-- 2. DASHBOARD ADMIN -->
         <div id="adminPanel" class="card hidden">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="color: var(--text-color); font-size: 1.1rem;">Kontrol Pengambilan</h3>
@@ -210,8 +142,8 @@
             </div>
 
             <div class="tab-menu">
-                <button id="tabBelumBtn" class="active" onclick="switchAdminTab('Belum Diambil')">Belum Mengambil</button>
-                <button id="tabSudahBtn" onclick="switchAdminTab('Sudah Diambil')">Sudah Mengambil</button>
+                <button id="tabBelumBtn" class="active" onclick="switchAdminTab('Belum Diambil')">Belum Lengkap</button>
+                <button id="tabSudahBtn" onclick="switchAdminTab('Sudah Diambil')">Sudah Lengkap</button>
             </div>
             
             <div id="adminListContainer">
@@ -221,7 +153,7 @@
             <button class="btn btn-outline" style="margin-top:20px;" onclick="logout()">Keluar (Logout)</button>
         </div>
 
-        <!-- 3. MENU USER / PRAJURIT -->
+        <!-- 3. MENU USER -->
         <div id="mainMenu" class="hidden">
             <div class="menu-grid">
                 <div class="menu-item" onclick="showForm()">
@@ -236,7 +168,7 @@
             <button class="btn btn-outline" style="margin-top:20px;" onclick="logout()">Keluar (Logout)</button>
         </div>
 
-        <!-- 4. Form Input Ukuran -->
+        <!-- 4. FORM INPUT UKURAN -->
         <div id="formPage" class="card hidden">
             <h3 style="color: var(--text-color); margin-bottom: 15px;">Formulir Ukuran Kaporlap</h3>
             <form id="kaporlapForm">
@@ -245,7 +177,7 @@
                     <input type="text" id="pangkat" class="form-control" placeholder="Contoh: Serda / Sertu / Kapten" required>
                 </div>
                 <div class="form-group">
-                    <label for="ukuranPDL">Ukuran PDL</label>
+                    <label for="ukuranPDL">Ukuran Baju PDL</label>
                     <select id="ukuranPDL" class="form-control" required>
                         <option value="">-- Pilih Ukuran --</option>
                         <option value="K">K (Kecil)</option>
@@ -259,15 +191,19 @@
                     <input type="number" id="ukuranSepatu" class="form-control" min="38" max="47" placeholder="Contoh: 42" required>
                 </div>
                 <div class="form-group">
-                    <label for="ukuranTopi">Ukuran Topi / Pet / Baret</label>
-                    <input type="number" id="ukuranTopi" class="form-control" min="53" max="62" placeholder="Contoh: 57" required>
-                </div>
-                <div class="form-group">
                     <label for="ukuranSepatuOlahraga">Ukuran Sepatu Olah Raga</label>
                     <input type="number" id="ukuranSepatuOlahraga" class="form-control" min="38" max="47" placeholder="Contoh: 42" required>
                 </div>
                 <div class="form-group">
-                    <label for="ukuranPDHS">Ukuran PDHS</label>
+                    <label for="ukuranSepatuTac">Ukuran Sepatu Tactical</label>
+                    <input type="number" id="ukuranSepatuTac" class="form-control" min="38" max="47" placeholder="Contoh: 42" required>
+                </div>
+                <div class="form-group">
+                    <label for="ukuranTopi">Ukuran Topi / Pet / Baret</label>
+                    <input type="number" id="ukuranTopi" class="form-control" min="53" max="62" placeholder="Contoh: 57" required>
+                </div>
+                <div class="form-group">
+                    <label for="ukuranPDHS">Ukuran Baju Tactical</label>
                     <select id="ukuranPDHS" class="form-control" required>
                         <option value="">-- Pilih Ukuran --</option>
                         <option value="K">K (Kecil)</option>
@@ -281,7 +217,7 @@
             </form>
         </div>
 
-        <!-- 5. Halaman Tampilan Data & Status User -->
+        <!-- 5. TAMPILAN STATUS USER -->
         <div id="dataPage" class="card hidden">
             <h3 style="color: var(--text-color); margin-bottom: 15px;">Status & Ukuran Saya</h3>
             <div id="userStatusContainer" style="margin-bottom: 15px;"></div>
@@ -291,19 +227,40 @@
     </div>
 </div>
 
+<!-- MODAL CHECKLIST ITEM ADMIN -->
+<div id="itemModal" class="modal-overlay hidden">
+    <div class="card modal-body">
+        <h3 id="modalMemberName" style="color: var(--text-color); margin-bottom: 2px;">-</h3>
+        <p id="modalMemberNrp" style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">-</p>
+        
+        <form id="checklistForm">
+            <input type="hidden" id="modalTargetNrp">
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; font-size: 0.9rem;">
+                <label><input type="checkbox" name="kaporlapItem" value="Baju PDL"> Baju PDL (<strong id="sizePDL">-</strong>)</label>
+                <label><input type="checkbox" name="kaporlapItem" value="Sepatu PDL"> Sepatu PDL (<strong id="sizeSepatuPDL">-</strong>)</label>
+                <label><input type="checkbox" name="kaporlapItem" value="Sepatu Olah Raga"> Sepatu Olah Raga (<strong id="sizeSepatuOR">-</strong>)</label>
+                <label><input type="checkbox" name="kaporlapItem" value="Sepatu Tactical"> Sepatu Tactical (<strong id="sizeSepatuTac">-</strong>)</label>
+                <label><input type="checkbox" name="kaporlapItem" value="Topi"> Topi / Pet / Baret (<strong id="sizeTopi">-</strong>)</label>
+                <label><input type="checkbox" name="kaporlapItem" value="Baju Tactical"> Baju Tactical (<strong id="sizeBajuTac">-</strong>)</label>
+            </div>
+
+            <button type="button" class="btn btn-success" onclick="saveChecklist()">SIMPAN PERUBAHAN</button>
+            <button type="button" class="btn btn-outline" onclick="closeItemModal()">BATAL</button>
+        </form>
+    </div>
+</div>
+
 <script>
-    // PASTI-KAN URL INI SAMA DENGAN WEB APP DEPLOYMENT GOOGLE APPS SCRIPT ANDA
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMX-VdF-EnZ-f64GNoSvRwHzUQ1hwjjwPA4K9_u-QBS9SXcbRlXj2V0DZUgB5EP3ku/exec";
+    // MASUKKAN URL GOOGLE APPS SCRIPT DEPLOYMENT DI SINI
+    const SCRIPT_URL = "GANTI_DENGAN_URL_DEPLOY_APPS_SCRIPT_ANDA";
     
     let currentSession = { nrp: "", nama: "", role: "" };
     let allAdminData = [];
     let currentAdminFilter = "Belum Diambil";
 
-    // Event Listener
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
     document.getElementById('kaporlapForm').addEventListener('submit', handleSimpanUkuran);
 
-    // Fetch Helper
     async function postToAppsScript(payload) {
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
@@ -313,7 +270,6 @@
         return await response.json();
     }
 
-    // Process Login
     async function handleLogin(e) {
         e.preventDefault();
         const submitBtn = document.getElementById('btnLogin');
@@ -345,14 +301,12 @@
                 showToast(result.message || 'NRP atau Password salah!', 'error');
             }
         } catch (err) {
-            console.error('Error login:', err);
             showToast('Gagal terhubung ke server!', 'error');
         } finally {
             setButtonLoading(submitBtn, false);
         }
     }
 
-    // Function Admin: Load Data Anggota
     async function loadAdminData() {
         const container = document.getElementById('adminListContainer');
         container.innerHTML = '<p style="text-align: center; color: #666;">Memuat data terbaru...</p>';
@@ -366,12 +320,10 @@
                 container.innerHTML = '<p style="text-align: center; color: red;">Gagal mengambil data.</p>';
             }
         } catch (err) {
-            console.error(err);
             container.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat data dari server.</p>';
         }
     }
 
-    // Switch Tab Filter Status
     function switchAdminTab(filter) {
         currentAdminFilter = filter;
         document.getElementById('tabBelumBtn').classList.toggle('active', filter === 'Belum Diambil');
@@ -379,18 +331,15 @@
         renderAdminList();
     }
 
-    // Live Filter dari Input Search
-    function filterAdminList() {
-        renderAdminList();
-    }
+    function filterAdminList() { renderAdminList(); }
 
-    // Render Anggota Berdasarkan Tab & Input Pencarian
     function renderAdminList() {
         const container = document.getElementById('adminListContainer');
         const searchQuery = document.getElementById('adminSearchInput').value.toLowerCase().trim();
 
         const filtered = allAdminData.filter(item => {
-            const matchStatus = item.status === currentAdminFilter;
+            const isLengkap = item.itemsTaken && item.itemsTaken.length === 6;
+            const matchStatus = (currentAdminFilter === 'Sudah Diambil') ? isLengkap : !isLengkap;
             const matchQuery = item.nrp.toString().toLowerCase().includes(searchQuery) || 
                                item.nama.toLowerCase().includes(searchQuery);
             return matchStatus && matchQuery;
@@ -403,49 +352,85 @@
 
         let html = '';
         filtered.forEach(item => {
-            const isSudah = item.status === "Sudah Diambil";
+            const takenCount = item.itemsTaken ? item.itemsTaken.length : 0;
             html += `
                 <div class="member-card">
-                    <div>
-                        <div style="font-weight: bold; color: var(--text-color);">${item.nama}</div>
-                        <div style="font-size: 0.8rem; color: #666;">NRP: <strong>${item.nrp}</strong> | ${item.pangkat}</div>
-                        ${isSudah ? `<div style="font-size: 0.75rem; color: #333; margin-top:2px;">Petugas: ${item.petugas} (${item.tglDiambil})</div>` : ''}
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: bold; color: var(--text-color);">${item.nama}</div>
+                            <div style="font-size: 0.8rem; color: #666;">NRP: <strong>${item.nrp}</strong> | ${item.pangkat}</div>
+                        </div>
+                        <span class="status-badge ${takenCount === 6 ? 'badge-success' : 'badge-danger'}">
+                            ${takenCount}/6 Diambil
+                        </span>
                     </div>
-                    <div>
-                        ${isSudah 
-                            ? `<button class="btn btn-sm btn-danger" onclick="toggleStatus('${item.nrp}', 'Belum Diambil')">Batalkan</button>`
-                            : `<button class="btn btn-sm btn-success" onclick="toggleStatus('${item.nrp}', 'Sudah Diambil')">Set Diambil</button>`
-                        }
+                    
+                    <div style="font-size: 0.75rem; color: #444;">
+                        <strong>Terambil:</strong> ${item.itemsTaken && item.itemsTaken.length > 0 ? item.itemsTaken.join(', ') : 'Belum ada'}
                     </div>
+
+                    <button class="btn btn-sm" onclick="openItemModal('${item.nrp}')" style="width: 100%; margin-top: 5px;">
+                        📋 Kelola Pengambilan
+                    </button>
                 </div>
             `;
         });
         container.innerHTML = html;
     }
 
-    // Admin Toggle Status Pengambilan
-    async function toggleStatus(targetNrp, newStatus) {
+    function openItemModal(nrp) {
+        const member = allAdminData.find(m => m.nrp.toString() === nrp.toString());
+        if (!member) return;
+
+        document.getElementById('modalTargetNrp').value = member.nrp;
+        document.getElementById('modalMemberName').innerText = member.nama;
+        document.getElementById('modalMemberNrp').innerText = `NRP: ${member.nrp} | ${member.pangkat}`;
+
+        document.getElementById('sizePDL').innerText = member.pdl || '-';
+        document.getElementById('sizeSepatuPDL').innerText = member.sepatuPDL || '-';
+        document.getElementById('sizeSepatuOR').innerText = member.sepatuOR || '-';
+        document.getElementById('sizeSepatuTac').innerText = member.sepatuTac || '-';
+        document.getElementById('sizeTopi').innerText = member.topi || '-';
+        document.getElementById('sizeBajuTac').innerText = member.bajuTac || '-';
+
+        const checkboxes = document.querySelectorAll('input[name="kaporlapItem"]');
+        checkboxes.forEach(cb => {
+            cb.checked = member.itemsTaken && member.itemsTaken.includes(cb.value);
+        });
+
+        document.getElementById('itemModal').classList.remove('hidden');
+    }
+
+    function closeItemModal() {
+        document.getElementById('itemModal').classList.add('hidden');
+    }
+
+    async function saveChecklist() {
+        const nrp = document.getElementById('modalTargetNrp').value;
+        const checkboxes = document.querySelectorAll('input[name="kaporlapItem"]:checked');
+        const selectedItems = Array.from(checkboxes).map(cb => cb.value);
+
         try {
-            showToast('Memproses...', 'info');
+            showToast('Menyimpan...', 'info');
             const res = await postToAppsScript({
-                action: 'update_status_pengambilan',
-                targetNrp: targetNrp,
-                newStatus: newStatus,
+                action: 'update_items_pengambilan',
+                targetNrp: nrp,
+                itemsTaken: selectedItems,
                 adminName: currentSession.nama
             });
 
             if (res.status === 'success') {
                 showToast(res.message, 'success');
+                closeItemModal();
                 loadAdminData();
             } else {
                 showToast(res.message, 'error');
             }
         } catch (err) {
-            showToast('Gagal mengubah status', 'error');
+            showToast('Gagal memperbarui data', 'error');
         }
     }
 
-    // Save Ukuran Form
     async function handleSimpanUkuran(e) {
         e.preventDefault();
         const submitBtn = document.getElementById('btnSimpan');
@@ -458,8 +443,9 @@
             pangkat: document.getElementById('pangkat').value,
             ukuranPDL: document.getElementById('ukuranPDL').value,
             ukuranSepatu: document.getElementById('ukuranSepatu').value,
-            ukuranTopi: document.getElementById('ukuranTopi').value,
             ukuranSepatuOlahraga: document.getElementById('ukuranSepatuOlahraga').value,
+            ukuranSepatuTac: document.getElementById('ukuranSepatuTac').value,
+            ukuranTopi: document.getElementById('ukuranTopi').value,
             ukuranPDHS: document.getElementById('ukuranPDHS').value
         };
 
@@ -479,7 +465,6 @@
         }
     }
 
-    // User: Load Status & Ukuran Saya
     async function loadMyData() {
         showDisplayPage();
         const container = document.getElementById('dataContainer');
@@ -490,12 +475,11 @@
             const res = await postToAppsScript({ action: 'get_my_data', nrp: currentSession.nrp });
             if (res.status === 'success') {
                 const st = res.statusInfo;
-                const isSudah = st.status === "Sudah Diambil";
                 statusContainer.innerHTML = `
-                    <div style="padding: 12px; border-radius: 8px; background: ${isSudah ? '#E8F5E9' : '#FFEBEE'}; border: 1px solid ${isSudah ? '#A5D6A7' : '#EF9A9A'};">
-                        <div style="font-size:0.85rem;">Status Pengambilan Kaporlap:</div>
-                        <span class="status-badge ${isSudah ? 'badge-success' : 'badge-danger'}">${st.status}</span>
-                        ${isSudah ? `<div style="font-size:0.75rem; margin-top:5px; color:#555;">Diambil: ${st.tglDiambil}<br>Petugas: ${st.petugas}</div>` : ''}
+                    <div style="padding: 12px; border-radius: 8px; background: #E8F5E9; border: 1px solid #A5D6A7;">
+                        <div style="font-size:0.85rem;">Progres Pengambilan:</div>
+                        <span class="status-badge badge-success">${st.status}</span>
+                        ${st.tglDiambil !== '-' ? `<div style="font-size:0.75rem; margin-top:5px; color:#555;">Terakhir diperbarui: ${st.tglDiambil}<br>Petugas: ${st.petugas}</div>` : ''}
                     </div>
                 `;
 
@@ -504,13 +488,13 @@
                     res.data.forEach((item) => {
                         html += `
                             <div style="border: 1px solid #90E0EF; border-radius: 8px; padding: 12px; margin-bottom: 10px; background: #F0F9FF;">
-                                <div style="font-size:0.75rem; color:#0077B6;">📅 ${item.timestamp}</div>
-                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.85rem; margin-top:5px;">
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.85rem;">
                                     <div><strong>PDL:</strong> ${item.ukuranPDL}</div>
                                     <div><strong>Sepatu PDL:</strong> ${item.ukuranSepatu}</div>
-                                    <div><strong>Topi:</strong> ${item.ukuranTopi}</div>
                                     <div><strong>Sepatu OR:</strong> ${item.ukuranSepatuOlahraga}</div>
-                                    <div><strong>PDHS:</strong> ${item.ukuranPDHS}</div>
+                                    <div><strong>Sepatu Tac:</strong> ${item.ukuranSepatuTac}</div>
+                                    <div><strong>Topi:</strong> ${item.ukuranTopi}</div>
+                                    <div><strong>Baju Tac:</strong> ${item.ukuranPDHS}</div>
                                 </div>
                             </div>`;
                     });
@@ -524,7 +508,6 @@
         }
     }
 
-    // Helper Indicators & Navigasi
     function setButtonLoading(button, isLoading, textLoading = 'Memproses...') {
         if (!button) return;
         if (isLoading) {
@@ -535,9 +518,7 @@
         } else {
             button.classList.remove('btn-loading');
             button.disabled = false;
-            if (button.dataset.originalText) {
-                button.innerHTML = button.dataset.originalText;
-            }
+            if (button.dataset.originalText) button.innerHTML = button.dataset.originalText;
         }
     }
 
