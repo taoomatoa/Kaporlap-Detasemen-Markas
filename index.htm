@@ -370,6 +370,8 @@
                 currentSession.nama = result.nama;
                 currentSession.role = result.role;
 
+                localStorage.setItem('kaporlap_session', JSON.stringify(currentSession));
+
                 document.getElementById('userInfo').innerText = `${result.nama} (${result.role})`;
                 showToast('Login berhasil!', 'success');
 
@@ -390,6 +392,25 @@
             setButtonLoading(submitBtn, false);
         }
     }
+
+    // CEK SESI SAAT HALAMAN DI-REFRESH
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedSession = localStorage.getItem('kaporlap_session');
+        
+        if (savedSession) {
+            // Jika ada data login tersimpan, muat ulang sesi secara otomatis
+            currentSession = JSON.parse(savedSession);
+            document.getElementById('userInfo').innerText = `${currentSession.nama} (${currentSession.role})`;
+            
+            hideAllPages();
+            if (currentSession.role === 'Admin') {
+                document.getElementById('adminPanel').classList.remove('hidden');
+                loadAdminData();
+            } else {
+                showMenu();
+            }
+        }
+    });
 
     async function loadAdminData() {
         const container = document.getElementById('adminListContainer');
@@ -729,6 +750,7 @@
     }
 
     function logout() {
+        localStorage.removeItem('kaporlap_session'); // Hapus sesi tersimpan
         currentSession = { nrp: "", nama: "", role: "" };
         document.getElementById('loginForm').reset();
         document.getElementById('userInfo').innerText = 'Aplikasi Internal Denma Paspampres';
