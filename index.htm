@@ -234,6 +234,28 @@
             flex: 1;
             word-break: break-word;
         }
+
+        .tab-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-menu button {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tab-menu button.active {
+            background: var(--primary-color);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -247,34 +269,37 @@
     </div>
 
     <div class="content">
-        <!-- Form Login -->
+        <!-- 1. Form Login -->
         <div id="loginCard" class="card">
-          <h2>Login Sistem Kaporlap</h2>
-          <div class="form-group">
-            <label>Username / NRP</label>
-            <input type="text" id="username" placeholder="Masukkan NRP">
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="password" placeholder="Masukkan Password">
-          </div>
-          <button id="btnLogin" onclick="login()">Login</button>
+            <h3 style="color: var(--text-color); margin-bottom: 15px; text-align: center;">Login Sistem Kaporlap</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginNrp">Username / NRP</label>
+                    <input type="text" id="loginNrp" class="form-control" placeholder="Masukkan NRP" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan Password" required>
+                </div>
+                <button type="submit" id="btnLogin" class="btn">MASUK</button>
+            </form>
         </div>
         
-        <!-- Dashboard Admin (Hanya tampil jika Role = Admin) -->
-        <div id="adminPanel" class="card" style="display: none;">
-          <h2>Dashboard Monitoring Admin</h2>
-          <div class="tab-menu">
-            <button onclick="switchTab('sudah')">Sudah Mengambil</button>
-            <button onclick="switchTab('belum')">Belum Mengambil</button>
-          </div>
-          
-          <div id="tableContainer">
-            <!-- Tabel rekapitulasi dipanggil lewat JS -->
-          </div>
+        <!-- Dashboard Admin (Tampil jika Role = Admin) -->
+        <div id="adminPanel" class="card hidden">
+            <h3 style="color: var(--text-color); margin-bottom: 15px;">Dashboard Monitoring Admin</h3>
+            <div class="tab-menu">
+                <button class="active" onclick="switchTab('sudah')">Sudah Mengambil</button>
+                <button onclick="switchTab('belum')">Belum Mengambil</button>
+            </div>
+            
+            <div id="tableContainer">
+                <p style="text-align: center; color: #666;">Memuat data monitoring...</p>
+            </div>
+            <button class="btn btn-outline" style="margin-top:20px;" onclick="logout()">Keluar (Logout)</button>
         </div>
 
-        <!-- 2. Menu Utama -->
+        <!-- 2. Menu Utama User/Prajurit -->
         <div id="mainMenu" class="hidden">
             <div class="menu-grid">
                 <div class="menu-item" onclick="showForm()">
@@ -298,7 +323,7 @@
             <button class="btn btn-outline" style="margin-top:20px;" onclick="logout()">Keluar (Logout)</button>
         </div>
 
-        <!-- 3. Form Input -->
+        <!-- 3. Form Input Ukuran -->
         <div id="formPage" class="card hidden">
             <h3 style="color: var(--text-color); margin-bottom: 15px;">Formulir Ukuran Kaporlap</h3>
             <form id="kaporlapForm">
@@ -357,14 +382,14 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwJ3R58LpyzC04DP5bTeCpuz8deItg81isQ2DRxzM367M00fEDiYBUObtW0c-5qij9/exec";
-    let currentSession = { nrp: "", nama: "" };
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxl2feWPLQC_jwv1ZjZtBT8UnR3wx0nSyxdwiQ8mx9SXakdE_cfPeMLsPCFolbxsTM/exec";
+    let currentSession = { nrp: "", nama: "", role: "" };
 
-    // Event Listener Terintegrasi
+    // Event Listener
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
     document.getElementById('kaporlapForm').addEventListener('submit', handleSimpanUkuran);
 
-    // Helper untuk POST request ke Google Apps Script (menghindari CORS Pre-flight issue)
+    // Helper POST ke Google Apps Script
     async function postToAppsScript(payload) {
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
@@ -376,25 +401,40 @@
         return await response.json();
     }
 
-    // Handle Login Async
+    // Single Handle Login Async (Mendukung User & Admin)
     async function handleLogin(event) {
         event.preventDefault();
-        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const submitBtn = document.getElementById('btnLogin');
         const nrp = document.getElementById('loginNrp').value.trim();
         const password = document.getElementById('loginPassword').value;
 
         setButtonLoading(submitBtn, true, 'Sedang Masuk...');
 
         try {
-            const result = await postToAppsScript({ action: 'login', nrp: nrp, password: password });
+            const result = await postToAppsScript({ 
+                action: 'login', 
+                nrp: nrp, 
+                username: nrp, 
+                password: password 
+            });
 
             if (result.status === 'success') {
                 currentSession.nrp = nrp;
-                currentSession.nama = result.nama;
-                document.getElementById('userInfo').innerText = `Prajurit: ${result.nama} (${nrp})`;
+                currentSession.nama = result.nama || nrp;
+                currentSession.role = result.role || 'User';
+
+                document.getElementById('userInfo').innerText = `Pengguna: ${currentSession.nama} (${nrp})`;
                 showToast('Login berhasil! Selamat datang.', 'success');
-                showMenu();
-                checkBadgeSiap();
+
+                document.getElementById('loginCard').classList.add('hidden');
+
+                if (result.role === 'Admin') {
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    loadRekapData();
+                } else {
+                    showMenu();
+                    checkBadgeSiap();
+                }
             } else {
                 showToast(result.message || 'NRP atau Password salah!', 'error');
             }
@@ -406,41 +446,7 @@
         }
     }
 
-    let currentUser = null;
-
-    async function login() {
-      const userVal = document.getElementById('username').value;
-      const passVal = document.getElementById('password').value;
-    
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({
-          action: 'login',
-          username: userVal,
-          password: passVal
-        })
-      });
-    
-      const result = await response.json();
-    
-      if (result.status === 'success') {
-        currentUser = result;
-        document.getElementById('loginCard').style.display = 'none';
-    
-        if (result.role === 'Admin') {
-          // Tampilkan Fitur Admin
-          document.getElementById('adminPanel').style.display = 'block';
-          loadRekapData(); // Load tabel rekap mengambil/belum
-        } else {
-          // Tampilkan Form Input Kaporlap (User/Prajurit biasa)
-          document.getElementById('formKaporlap').style.display = 'block';
-        }
-      } else {
-        showToast(result.message, 'error');
-      }
-    }
-
-    // Handle Simpan Ukuran Async
+    // Handle Simpan Ukuran
     async function handleSimpanUkuran(event) {
         event.preventDefault();
         const submitBtn = event.target.querySelector('button[type="submit"]');
@@ -474,6 +480,29 @@
             showToast('Gagal terhubung ke server!', 'error');
         } finally {
             setButtonLoading(submitBtn, false);
+        }
+    }
+
+    // Helper Tab Dashboard Admin
+    function switchTab(tabType) {
+        const buttons = document.querySelectorAll('.tab-menu button');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if(event) event.target.classList.add('active');
+        loadRekapData(tabType);
+    }
+
+    async function loadRekapData(type = 'sudah') {
+        const container = document.getElementById('tableContainer');
+        container.innerHTML = '<p style="text-align:center; color:#666;">Memuat data monitoring...</p>';
+        try {
+            const res = await postToAppsScript({ action: 'get_rekap_admin', type: type });
+            if (res.status === 'success' && res.data) {
+                container.innerHTML = `<div style="font-size:0.85rem;">Data ${type}: ${res.data.length} anggota</div>`;
+            } else {
+                container.innerHTML = '<p style="text-align:center; color:#888;">Tidak ada data.</p>';
+            }
+        } catch (err) {
+            container.innerHTML = '<p style="text-align:center; color:red;">Gagal memuat rekap admin.</p>';
         }
     }
 
@@ -516,7 +545,7 @@
         }, duration);
     }
 
-    // Notifikasi Badge Siap Diambil
+    // Badge Siap Diambil
     async function checkBadgeSiap() {
         try {
             const res = await postToAppsScript({ action: 'get_kaporlap_siap', nrp: currentSession.nrp });
@@ -530,7 +559,7 @@
         }
     }
 
-    // Load Data Ukuran
+    // Load Data Ukuran Saya
     async function loadMyData() {
         showDisplayPage('Ukuran Saya');
         const container = document.getElementById('dataContainer');
@@ -614,7 +643,7 @@
         }
     }
 
-    // Fungsi Navigasi Tampilan
+    // Navigasi Tampilan
     function showDisplayPage(title) {
         document.getElementById('pageTitle').innerText = title;
         document.getElementById('dataContainer').innerHTML = '<p style="text-align:center; color:#666;">Memuat data...</p>';
@@ -624,7 +653,8 @@
     }
 
     function showMenu() {
-        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('loginCard').classList.add('hidden');
+        document.getElementById('adminPanel').classList.add('hidden');
         document.getElementById('formPage').classList.add('hidden');
         document.getElementById('dataPage').classList.add('hidden');
         document.getElementById('mainMenu').classList.remove('hidden');
@@ -636,13 +666,14 @@
     }
 
     function logout() {
-        currentSession = { nrp: "", nama: "" };
+        currentSession = { nrp: "", nama: "", role: "" };
         document.getElementById('userInfo').innerText = 'Aplikasi Internal Denma Paspampres';
         document.getElementById('badgeSiap').classList.add('hidden');
         document.getElementById('mainMenu').classList.add('hidden');
+        document.getElementById('adminPanel').classList.add('hidden');
         document.getElementById('formPage').classList.add('hidden');
         document.getElementById('dataPage').classList.add('hidden');
-        document.getElementById('loginPage').classList.remove('hidden');
+        document.getElementById('loginCard').classList.remove('hidden');
         document.getElementById('loginForm').reset();
     }
 </script>
