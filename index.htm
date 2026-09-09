@@ -152,104 +152,93 @@
             font-size: 0.85rem;
             opacity: 0.9;
         }
-        /* Styling Spinner & State Loading pada Tombol */
+
+        /* Loading Spinner */
         .btn-loading {
-          position: relative;
-          pointer-events: none; /* Mencegah klik ganda saat proses berjalan */
-          opacity: 0.8;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
+            position: relative;
+            pointer-events: none;
+            opacity: 0.8;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         .spinner {
-          width: 16px;
-          height: 16px;
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          border-top-color: #ffffff;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-          display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
         }
         
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Toast Notification Styles */
         .toast-container {
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          z-index: 9999;
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          max-width: 320px;
-          width: calc(100% - 40px);
-          pointer-events: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 380px;
+            width: calc(100% - 40px);
+            pointer-events: none;
         }
         
         .toast {
-          pointer-events: auto;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 12px 16px;
-          border-radius: 8px;
-          background: #ffffff;
-          color: #333333;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          font-size: 14px;
-          font-weight: 500;
-          opacity: 0;
-          transform: translateY(-20px);
-          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-          border-left: 4px solid #333;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #333333;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border-left: 4px solid #333;
         }
         
         .toast.show {
-          opacity: 1;
-          transform: translateY(0);
+            opacity: 1;
+            transform: translateY(0);
         }
         
-        /* Tipe Toast */
-        .toast-success {
-          border-left-color: #2e7d32;
-        }
-        .toast-success .toast-icon {
-          color: #2e7d32;
-        }
-        
-        .toast-error {
-          border-left-color: #d32f2f;
-        }
-        .toast-error .toast-icon {
-          color: #d32f2f;
-        }
-        
-        .toast-info {
-          border-left-color: #0288d1;
-        }
-        .toast-info .toast-icon {
-          color: #0288d1;
-        }
+        .toast-success { border-left-color: #2e7d32; }
+        .toast-success .toast-icon { color: #2e7d32; }
+        .toast-error { border-left-color: #d32f2f; }
+        .toast-error .toast-icon { color: #d32f2f; }
+        .toast-info { border-left-color: #0288d1; }
+        .toast-info .toast-icon { color: #0288d1; }
         
         .toast-icon {
-          font-size: 18px;
-          font-weight: bold;
-          line-height: 1;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1;
         }
         
         .toast-message {
-          flex: 1;
-          word-break: break-word;
+            flex: 1;
+            word-break: break-word;
         }
     </style>
 </head>
 <body>
+
+<div id="toast-container" class="toast-container"></div>
 
 <div class="mobile-container">
     <div class="header">
@@ -358,37 +347,53 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZPET_490hOG-x1PM7jdnUCmT9ouvcoYEbWV1QWz3G3rafKSHBD6vt32d9FYD4WXlW/exec";
-
     let currentSession = { nrp: "", nama: "" };
 
-    // Login
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    // Event Listener Terintegrasi
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    document.getElementById('kaporlapForm').addEventListener('submit', handleSimpanUkuran);
+
+    // Handle Login Async dengan Spinner & Toast
+    async function handleLogin(event) {
+        event.preventDefault();
+        const submitBtn = event.target.querySelector('button[type="submit"]');
         const nrp = document.getElementById('loginNrp').value;
         const password = document.getElementById('loginPassword').value;
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'login', nrp: nrp, password: password })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
+        setButtonLoading(submitBtn, true, 'Sedang Masuk...');
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'login', nrp: nrp, password: password })
+            });
+            const result = await response.json();
+
+            if (result.status === 'success') {
                 currentSession.nrp = nrp;
-                currentSession.nama = data.nama;
-                document.getElementById('userInfo').innerText = `Prajurit: ${data.nama} (${nrp})`;
+                currentSession.nama = result.nama;
+                document.getElementById('userInfo').innerText = `Prajurit: ${result.nama} (${nrp})`;
+                showToast('Login berhasil! Selamat datang.', 'success');
                 showMenu();
                 checkBadgeSiap();
             } else {
-                alert(data.message);
+                showToast(result.message || 'NRP atau Password salah!', 'error');
             }
-        })
-        .catch(err => alert('Gagal terhubung ke server!'));
-    });
+        } catch (error) {
+            console.error('Error login:', error);
+            showToast('Gagal terhubung ke server!', 'error');
+        } finally {
+            setButtonLoading(submitBtn, false);
+        }
+    }
 
-    // Simpan
-    document.getElementById('kaporlapForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    // Handle Simpan Ukuran Async dengan Spinner & Toast
+    async function handleSimpanUkuran(event) {
+        event.preventDefault();
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        
+        setButtonLoading(submitBtn, true, 'Menyimpan Data...');
+
         const payload = {
             action: 'simpan_kaporlap',
             nrp: currentSession.nrp,
@@ -401,18 +406,68 @@
             ukuranPDHS: document.getElementById('ukuranPDHS').value
         };
 
-        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.message);
-            if (data.status === 'success') {
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                showToast('Data ukuran kaporlap berhasil disimpan.', 'success');
                 document.getElementById('kaporlapForm').reset();
                 showMenu();
+            } else {
+                showToast(result.message || 'Gagal menyimpan data.', 'error');
             }
-        });
-    });
+        } catch (error) {
+            console.error('Error simpan data:', error);
+            showToast('Gagal terhubung ke server!', 'error');
+        } finally {
+            setButtonLoading(submitBtn, false);
+        }
+    }
 
-    // Cek Notifikasi Badge Siap Diambil
+    // Indicator Loading Tombol
+    function setButtonLoading(button, isLoading, textLoading = 'Memproses...') {
+        if (!button) return;
+        if (isLoading) {
+            button.dataset.originalText = button.innerHTML;
+            button.classList.add('btn-loading');
+            button.disabled = true;
+            button.innerHTML = `<span class="spinner"></span> <span>${textLoading}</span>`;
+        } else {
+            button.classList.remove('btn-loading');
+            button.disabled = false;
+            if (button.dataset.originalText) {
+                button.innerHTML = button.dataset.originalText;
+            }
+        }
+    }
+
+    // Toast Notification
+    function showToast(message, type = 'info', duration = 3000) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const icons = { success: '✓', error: '✕', info: 'ℹ' };
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <span class="toast-icon">${icons[type] || 'ℹ'}</span>
+            <span class="toast-message">${message}</span>
+        `;
+
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, duration);
+    }
+
+    // Notifikasi Badge Siap Diambil
     function checkBadgeSiap() {
         fetch(SCRIPT_URL, {
             method: 'POST',
@@ -425,7 +480,8 @@
                 badge.innerText = res.data.length;
                 badge.classList.remove('hidden');
             }
-        });
+        })
+        .catch(err => console.error(err));
     }
 
     // Load Data Ukuran
@@ -505,131 +561,8 @@
             }
         });
     }
-    // Fungsi untuk mengaktifkan mode loading pada tombol
-    function setButtonLoading(button, isLoading, textLoading = 'Memproses...') {
-      if (!button) return;
-    
-      if (isLoading) {
-        // Simpan teks asli tombol agar bisa dikembalikan nanti
-        button.dataset.originalText = button.innerHTML;
-        button.classList.add('btn-loading');
-        button.disabled = true;
-        button.innerHTML = `<span class="spinner"></span> <span>${textLoading}</span>`;
-      } else {
-        // Kembalikan ke teks dan kondisi semula
-        button.classList.remove('btn-loading');
-        button.disabled = false;
-        if (button.dataset.originalText) {
-          button.innerHTML = button.dataset.originalText;
-        }
-      }
-    }
-    // Contoh pada Handle Login
-    async function handleLogin(event) {
-      event.preventDefault();
-      const submitBtn = event.target.querySelector('button[type="submit"]');
-    
-      setButtonLoading(submitBtn, true, 'Sedang Masuk...');
-    
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            action: 'login',
-            nrp: document.getElementById('loginNrp').value,
-            password: document.getElementById('loginPassword').value
-          })
-        });
-        const result = await response.json();
-    
-        if (result.status === 'success') {
-          showToast('Login berhasil! Selamat datang.', 'success');
-          // Jalankan logika login sukses Anda
-        } else {
-          showToast(result.message || 'NRP atau Password salah!', 'error');
-        }
-      } catch (error) {
-        console.error('Error login:', error);
-        showToast('Terjadi kesalahan koneksi ke server!', 'error');
-      } finally {
-        setButtonLoading(submitBtn, false);
-      }
-    }
-    /**
-     * Menampilkan Toast Notification
-     * @param {string} message - Teks pesan yang ditampilkan
-     * @param {string} type - Tipe notifikasi: 'success' | 'error' | 'info'
-     * @param {number} duration - Durasi tampil (ms), default: 3000
-     */
-    function showToast(message, type = 'info', duration = 3000) {
-      const container = document.getElementById('toast-container');
-      if (!container) return;
-    
-      // Ikon sederhana berdasarkan jenis notifikasi
-      const icons = {
-        success: '✓',
-        error: '✕',
-        info: 'ℹ'
-      };
-    
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.innerHTML = `
-        <span class="toast-icon">${icons[type] || 'ℹ'}</span>
-        <span class="toast-message">${message}</span>
-      `;
-    
-      container.appendChild(toast);
-    
-      // Memicu animasi masuk (slide in & fade in)
-      setTimeout(() => toast.classList.add('show'), 10);
-    
-      // Otomatis hilangkan toast setelah durasi selesai
-      setTimeout(() => {
-        toast.classList.remove('show');
-        toast.addEventListener('transitionend', () => {
-          toast.remove();
-        });
-      }, duration);
-    }
 
-    // Contoh pada Handle Simpan Ukuran
-    async function handleSimpanUkuran(event) {
-      event.preventDefault();
-      const submitBtn = event.target.querySelector('button[type="submit"]');
-    
-      setButtonLoading(submitBtn, true, 'Menyimpan Data...');
-    
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            action: 'simpan_kaporlap',
-            nrp: currentSession.nrp,
-            nama: currentSession.nama,
-            pangkat: document.getElementById('pangkat').value,
-            ukuranPDL: document.getElementById('ukuranPDL').value,
-            ukuranSepatu: document.getElementById('ukuranSepatu').value,
-            ukuranTopi: document.getElementById('ukuranTopi').value,
-            ukuranSepatuOlahraga: document.getElementById('ukuranSepatuOR').value,
-            ukuranPDHS: document.getElementById('ukuranPDHS').value
-          })
-        });
-        const result = await response.json();
-    
-        if (result.status === 'success') {
-          showToast('Data ukuran kaporlap berhasil disimpan.', 'success');
-        } else {
-          showToast(result.message || 'Gagal menyimpan data.', 'error');
-        }
-      } catch (error) {
-        console.error('Error simpan data:', error);
-        showToast('Gagal terhubung ke server.', 'error');
-      } finally {
-        setButtonLoading(submitBtn, false);
-      }
-    }
-
+    // Fungsi Navigasi Tampilan
     function showDisplayPage(title) {
         document.getElementById('pageTitle').innerText = title;
         document.getElementById('dataContainer').innerHTML = '<p style="text-align:center; color:#666;">Memuat data...</p>';
@@ -652,7 +585,7 @@
 
     function logout() {
         currentSession = { nrp: "", nama: "" };
-        document.getElementById('userInfo').innerText = 'Aplikasi Internal Anggota';
+        document.getElementById('userInfo').innerText = 'Aplikasi Internal Denma Paspampres';
         document.getElementById('badgeSiap').classList.add('hidden');
         document.getElementById('mainMenu').classList.add('hidden');
         document.getElementById('formPage').classList.add('hidden');
@@ -660,7 +593,5 @@
         document.getElementById('loginPage').classList.remove('hidden');
     }
 </script>
-<!-- Container untuk Toast Notifications -->
-<div id="toast-container" class="toast-container"></div>
 </body>
 </html>
