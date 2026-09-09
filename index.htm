@@ -124,7 +124,7 @@
         .hidden { display: none !important; }
         .user-info { font-size: 0.85rem; opacity: 0.9; }
 
-        /* Member Card Admin */
+        /* Kartu Daftar Anggota Admin */
         .member-card {
             border: 1px solid #E0E0E0;
             border-radius: 8px;
@@ -136,12 +136,39 @@
             align-items: center;
         }
 
+        /* Loading Spinner */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.8;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Toast Notification */
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; max-width: 380px; width: calc(100% - 40px); }
         .toast { padding: 12px 16px; border-radius: 8px; background: #333; color: white; margin-bottom: 8px; opacity: 0; transition: opacity 0.3s; font-size: 0.85rem; }
         .toast.show { opacity: 1; }
         .toast-success { background: var(--success-color); }
         .toast-error { background: var(--danger-color); }
+        .toast-info { background: var(--secondary-color); }
     </style>
 </head>
 <body>
@@ -171,15 +198,13 @@
             </form>
         </div>
         
-        <!-- 2. DASHBOARD ADMIN (Lengkap dengan Pencarian & Refresh) -->
+        <!-- 2. DASHBOARD ADMIN (Pencarian & Refresh) -->
         <div id="adminPanel" class="card hidden">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="color: var(--text-color); font-size: 1.1rem;">Kontrol Pengambilan</h3>
-                <!-- Tombol Refresh Data -->
                 <button type="button" class="btn btn-sm" onclick="loadAdminData()" style="width: auto; background-color: var(--secondary-color);">🔄 Refresh</button>
             </div>
             
-            <!-- Input Pencarian (Filter NRP / Nama) -->
             <div class="form-group" style="margin-bottom: 12px;">
                 <input type="text" id="adminSearchInput" class="form-control" placeholder="🔍 Cari NRP atau Nama..." onkeyup="filterAdminList()">
             </div>
@@ -251,7 +276,7 @@
                         <option value="XL">XL (Ekstra Besar)</option>
                     </select>
                 </div>
-                <button type="submit" class="btn">SIMPAN DATA</button>
+                <button type="submit" id="btnSimpan" class="btn">SIMPAN DATA</button>
                 <button type="button" class="btn btn-outline" onclick="showMenu()">KEMBALI</button>
             </form>
         </div>
@@ -267,18 +292,18 @@
 </div>
 
 <script>
+    // PASTI-KAN URL INI SAMA DENGAN WEB APP DEPLOYMENT GOOGLE APPS SCRIPT ANDA
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1C7rkiCGI7Y5Mt6w2PWZWNrdXwOMiM3wa4r5RmiSKijmusbYNrqaNJmgyHBfgtHFf/exec";
+    
     let currentSession = { nrp: "", nama: "", role: "" };
     let allAdminData = [];
     let currentAdminFilter = "Belum Diambil";
-
-
-    
 
     // Event Listener
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
     document.getElementById('kaporlapForm').addEventListener('submit', handleSimpanUkuran);
 
+    // Fetch Helper
     async function postToAppsScript(payload) {
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
@@ -291,8 +316,11 @@
     // Process Login
     async function handleLogin(e) {
         e.preventDefault();
+        const submitBtn = document.getElementById('btnLogin');
         const nrp = document.getElementById('loginNrp').value.trim();
         const password = document.getElementById('loginPassword').value;
+
+        setButtonLoading(submitBtn, true, 'Sedang Masuk...');
 
         try {
             const result = await postToAppsScript({ action: 'login', nrp: nrp, password: password });
@@ -314,16 +342,15 @@
                     showMenu();
                 }
             } else {
-                showToast(result.message, 'error');
+                showToast(result.message || 'NRP atau Password salah!', 'error');
             }
         } catch (err) {
+            console.error('Error login:', err);
             showToast('Gagal terhubung ke server!', 'error');
+        } finally {
+            setButtonLoading(submitBtn, false);
         }
     }
-
-    // Global variable untuk menyimpan data & filter
-    let allAdminData = [];
-    let currentAdminFilter = "Belum Diambil";
 
     // Function Admin: Load Data Anggota
     async function loadAdminData() {
@@ -339,6 +366,7 @@
                 container.innerHTML = '<p style="text-align: center; color: red;">Gagal mengambil data.</p>';
             }
         } catch (err) {
+            console.error(err);
             container.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat data dari server.</p>';
         }
     }
@@ -361,7 +389,6 @@
         const container = document.getElementById('adminListContainer');
         const searchQuery = document.getElementById('adminSearchInput').value.toLowerCase().trim();
 
-        // Filter berdasarkan Status + Keyword (NRP / Nama)
         const filtered = allAdminData.filter(item => {
             const matchStatus = item.status === currentAdminFilter;
             const matchQuery = item.nrp.toString().toLowerCase().includes(searchQuery) || 
@@ -396,39 +423,7 @@
         container.innerHTML = html;
     }
 
-    // Render Anggota Berdasarkan Tab Admin
-    function renderAdminList() {
-        const container = document.getElementById('adminListContainer');
-        const filtered = allAdminData.filter(item => item.status === currentAdminFilter);
-
-        if (filtered.length === 0) {
-            container.innerHTML = `<p style="text-align: center; color: #888; margin: 20px 0;">Tidak ada anggota yang ${currentAdminFilter.toLowerCase()}.</p>`;
-            return;
-        }
-
-        let html = '';
-        filtered.forEach(item => {
-            const isSudah = item.status === "Sudah Diambil";
-            html += `
-                <div class="member-card">
-                    <div>
-                        <div style="font-weight: bold; color: var(--text-color);">${item.nama}</div>
-                        <div style="font-size: 0.8rem; color: #666;">NRP: ${item.nrp} | ${item.pangkat}</div>
-                        ${isSudah ? `<div style="font-size: 0.75rem; color: #333; margin-top:2px;">Petugas: ${item.petugas} (${item.tglDiambil})</div>` : ''}
-                    </div>
-                    <div>
-                        ${isSudah 
-                            ? `<button class="btn btn-sm btn-danger" onclick="toggleStatus('${item.nrp}', 'Belum Diambil')">Batalkan</button>`
-                            : `<button class="btn btn-sm btn-success" onclick="toggleStatus('${item.nrp}', 'Sudah Diambil')">Set Diambil</button>`
-                        }
-                    </div>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-    }
-
-    // Admin Toggle Status Pengambilan (Ubah status Pengambilan Anggota)
+    // Admin Toggle Status Pengambilan
     async function toggleStatus(targetNrp, newStatus) {
         try {
             showToast('Memproses...', 'info');
@@ -441,7 +436,7 @@
 
             if (res.status === 'success') {
                 showToast(res.message, 'success');
-                loadAdminData(); // Refresh Data Admin
+                loadAdminData();
             } else {
                 showToast(res.message, 'error');
             }
@@ -453,6 +448,9 @@
     // Save Ukuran Form
     async function handleSimpanUkuran(e) {
         e.preventDefault();
+        const submitBtn = document.getElementById('btnSimpan');
+        setButtonLoading(submitBtn, true, 'Menyimpan...');
+
         const payload = {
             action: 'simpan_kaporlap',
             nrp: currentSession.nrp,
@@ -471,9 +469,13 @@
                 showToast(res.message, 'success');
                 document.getElementById('kaporlapForm').reset();
                 showMenu();
+            } else {
+                showToast(res.message || 'Gagal menyimpan data.', 'error');
             }
         } catch (err) {
             showToast('Gagal menyimpan data!', 'error');
+        } finally {
+            setButtonLoading(submitBtn, false);
         }
     }
 
@@ -487,7 +489,6 @@
         try {
             const res = await postToAppsScript({ action: 'get_my_data', nrp: currentSession.nrp });
             if (res.status === 'success') {
-                // Render Status Pengambilan
                 const st = res.statusInfo;
                 const isSudah = st.status === "Sudah Diambil";
                 statusContainer.innerHTML = `
@@ -498,7 +499,6 @@
                     </div>
                 `;
 
-                // Render Riwayat Ukuran
                 if (res.data.length > 0) {
                     let html = '';
                     res.data.forEach((item) => {
@@ -524,7 +524,23 @@
         }
     }
 
-    // Navigasi Tampilan
+    // Helper Indicators & Navigasi
+    function setButtonLoading(button, isLoading, textLoading = 'Memproses...') {
+        if (!button) return;
+        if (isLoading) {
+            button.dataset.originalText = button.innerHTML;
+            button.classList.add('btn-loading');
+            button.disabled = true;
+            button.innerHTML = `<span class="spinner"></span> <span>${textLoading}</span>`;
+        } else {
+            button.classList.remove('btn-loading');
+            button.disabled = false;
+            if (button.dataset.originalText) {
+                button.innerHTML = button.dataset.originalText;
+            }
+        }
+    }
+
     function showDisplayPage() {
         document.getElementById('mainMenu').classList.add('hidden');
         document.getElementById('formPage').classList.add('hidden');
