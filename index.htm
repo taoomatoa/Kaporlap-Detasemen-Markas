@@ -268,6 +268,7 @@
     // Handle Simpan Data Kaporlap
     document.getElementById('kaporlapForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        
         const payload = {
             action: 'simpan_kaporlap',
             nrp: currentSession.nrp,
@@ -276,8 +277,8 @@
             ukuranPDL: document.getElementById('ukuranPDL').value,
             ukuranSepatu: document.getElementById('ukuranSepatu').value,
             ukuranTopi: document.getElementById('ukuranTopi').value,
-            jenisSabuk: document.getElementById('jenisSabuk').value,
-            atribut: document.getElementById('atribut').value
+            ukuranSepatuOlahraga: document.getElementById('ukuranSepatuOlahraga').value,
+            ukuranPDHS: document.getElementById('ukuranPDHS').value
         };
 
         fetch(SCRIPT_URL, {
@@ -288,10 +289,11 @@
         .then(data => {
             alert(data.message);
             if (data.status === 'success') {
+                document.getElementById('kaporlapForm').reset();
                 showMenu();
             }
         })
-        .catch(err => alert('Gagal menyimpan data!'));
+        .catch(err => alert('Gagal menyimpan data! Periksa koneksi internet Anda.'));
     });
 
     function showMenu() {
