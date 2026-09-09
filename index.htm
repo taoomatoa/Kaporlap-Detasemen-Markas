@@ -13,227 +13,36 @@
             --text-color: #023E8A;
             --alert-color: #FF9F1C;
             --success-color: #2EC4B6;
+            --admin-color: #D32F2F;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .mobile-container { width: 100%; max-width: 420px; background-color: var(--card-bg); min-height: 100vh; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; position: relative; }
+        .header { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+        .header h2 { font-size: 1.2rem; margin-bottom: 5px; }
+        .content { padding: 20px; flex: 1; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #BEE3F8; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: var(--text-color); font-weight: 600; font-size: 0.9rem; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #90E0EF; border-radius: 8px; font-size: 0.95rem; outline: none; }
+        .btn { width: 100%; padding: 12px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background-color: var(--secondary-color); }
+        .btn-success { background-color: var(--success-color); }
+        .btn-outline { background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); margin-top: 10px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .menu-item { background: #E0F7FA; border: 1px solid #90E0EF; padding: 15px 10px; border-radius: 12px; text-align: center; cursor: pointer; color: var(--text-color); font-weight: bold; font-size: 0.85rem; position: relative; }
+        .menu-admin { background: #FFEBEE; border-color: #FFCDD2; color: var(--admin-color); grid-column: span 2; }
+        .badge { position: absolute; top: 5px; right: 5px; background: red; color: white; font-size: 0.75rem; border-radius: 50%; padding: 2px 6px; }
+        .hidden { display: none; }
+        .user-info { font-size: 0.85rem; opacity: 0.9; }
 
-        body {
-            background-color: var(--bg-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .mobile-container {
-            width: 100%;
-            max-width: 420px;
-            background-color: var(--card-bg);
-            min-height: 100vh;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-        }
-
-        .header h2 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
-
-        .content {
-            padding: 20px;
-            flex: 1;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid #BEE3F8;
-            margin-bottom: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--text-color);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #90E0EF;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background-color: var(--secondary-color);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            margin-top: 10px;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .menu-item {
-            background: #E0F7FA;
-            border: 1px solid #90E0EF;
-            padding: 15px 10px;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            color: var(--text-color);
-            font-weight: bold;
-            font-size: 0.85rem;
-            position: relative;
-        }
-
-        .badge {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: red;
-            color: white;
-            font-size: 0.75rem;
-            border-radius: 50%;
-            padding: 2px 6px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .user-info {
-            font-size: 0.85rem;
-            opacity: 0.9;
-        }
-
-        /* Loading Spinner */
-        .btn-loading {
-            position: relative;
-            pointer-events: none;
-            opacity: 0.8;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Toast Notification Styles */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-width: 380px;
-            width: calc(100% - 40px);
-            pointer-events: none;
-        }
-        
-        .toast {
-            pointer-events: auto;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            background: #ffffff;
-            color: #333333;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            font-size: 14px;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            border-left: 4px solid #333;
-        }
-        
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
+        /* Toast Styles */
+        .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 380px; width: calc(100% - 40px); pointer-events: none; }
+        .toast { pointer-events: auto; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; background: #ffffff; color: #333; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 14px; font-weight: 500; opacity: 0; transform: translateY(-20px); transition: all 0.3s; border-left: 4px solid #333; }
+        .toast.show { opacity: 1; transform: translateY(0); }
         .toast-success { border-left-color: #2e7d32; }
-        .toast-success .toast-icon { color: #2e7d32; }
         .toast-error { border-left-color: #d32f2f; }
-        .toast-error .toast-icon { color: #d32f2f; }
-        .toast-info { border-left-color: #0288d1; }
-        .toast-info .toast-icon { color: #0288d1; }
-        
-        .toast-icon {
-            font-size: 18px;
-            font-weight: bold;
-            line-height: 1;
-        }
-        
-        .toast-message {
-            flex: 1;
-            word-break: break-word;
-        }
     </style>
 </head>
 <body>
@@ -247,17 +56,17 @@
     </div>
 
     <div class="content">
-        <!-- 1. Login -->
+        <!-- 1. Login Page -->
         <div id="loginPage" class="card">
             <h3 style="color: var(--text-color); margin-bottom: 15px; text-align: center;">Masuk Anggota</h3>
             <form id="loginForm">
                 <div class="form-group">
                     <label>NRP / NIK</label>
-                    <input type="text" id="loginNrp" class="form-control" placeholder="Masukkan NRP" required>
+                    <input type="text" id="loginNrp" class="form-control" autocomplete="username" placeholder="Masukkan NRP" required>
                 </div>
                 <div class="form-group">
                     <label>Kata Sandi</label>
-                    <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan Password" required>
+                    <input type="password" id="loginPassword" class="form-control" autocomplete="current-password" placeholder="Masukkan Password" required>
                 </div>
                 <button type="submit" class="btn">MASUK</button>
             </form>
@@ -283,6 +92,12 @@
                     <div style="font-size: 1.5rem;">✅</div>
                     <div>Telah Diambil</div>
                 </div>
+                
+                <!-- MENU KHUSUS ADMIN / PETUGAS GUDANG -->
+                <div id="adminMenuItem" class="menu-item menu-admin hidden" onclick="loadAdminControl()">
+                    <div style="font-size: 1.5rem;">🛡️</div>
+                    <div>Kontrol Pengambilan (Admin)</div>
+                </div>
             </div>
             <button class="btn btn-outline" style="margin-top:20px;" onclick="logout()">Keluar (Logout)</button>
         </div>
@@ -291,42 +106,20 @@
         <div id="formPage" class="card hidden">
             <h3 style="color: var(--text-color); margin-bottom: 15px;">Formulir Ukuran Kaporlap</h3>
             <form id="kaporlapForm">
-                <div class="form-group">
-                    <label>Pangkat</label>
-                    <input type="text" id="pangkat" class="form-control" placeholder="Contoh: Serda / Sertu / Kapten" required>
-                </div>
+                <div class="form-group"><label>Pangkat</label><input type="text" id="pangkat" class="form-control" placeholder="Contoh: Serda" required></div>
                 <div class="form-group">
                     <label>Ukuran PDL</label>
                     <select id="ukuranPDL" class="form-control" required>
-                        <option value="">-- Pilih Ukuran --</option>
-                        <option value="K">K (Kecil)</option>
-                        <option value="S">S (Sedang)</option>
-                        <option value="B">B (Besar)</option>
-                        <option value="EB">EB (Ekstra Besar)</option>
-                        <option value="EEB">EEB (Ekstra-Ekstra Besar)</option>
+                        <option value="">-- Pilih Ukuran --</option><option value="K">K</option><option value="S">S</option><option value="B">B</option><option value="EB">EB</option>
                     </select>
                 </div>
+                <div class="form-group"><label>Ukuran Sepatu PDL</label><input type="number" id="ukuranSepatu" class="form-control" min="38" max="47" required></div>
+                <div class="form-group"><label>Ukuran Topi / Pet / Baret</label><input type="number" id="ukuranTopi" class="form-control" min="53" max="62" required></div>
+                <div class="form-group"><label>Ukuran Sepatu Olah Raga</label><input type="number" id="ukuranSepatuOlahraga" class="form-control" min="38" max="47" required></div>
                 <div class="form-group">
-                    <label>Ukuran Sepatu PDL</label>
-                    <input type="number" id="ukuranSepatu" class="form-control" min="38" max="47" placeholder="Contoh: 42" required>
-                </div>
-                <div class="form-group">
-                    <label>Ukuran Topi / Pet / Baret</label>
-                    <input type="number" id="ukuranTopi" class="form-control" min="53" max="62" placeholder="Contoh: 57" required>
-                </div>
-                <div class="form-group">
-                    <label>Ukuran Sepatu Olah Raga</label>
-                    <input type="number" id="ukuranSepatuOlahraga" class="form-control" min="38" max="47" placeholder="Contoh: 42" required>
-                </div>
-                <div class="form-group">
-                    <label>Ukuran PDHS / Pakaian Dinas</label>
+                    <label>Ukuran PDHS</label>
                     <select id="ukuranPDHS" class="form-control" required>
-                        <option value="">-- Pilih Ukuran --</option>
-                        <option value="K">K (Kecil)</option>
-                        <option value="S">S (Sedang)</option>
-                        <option value="L">L (Besar)</option>
-                        <option value="XL">XL (Ekstra Besar)</option>
-                        <option value="XXL">XXL (Ekstra-Ekstra Besar)</option>
+                        <option value="">-- Pilih Ukuran --</option><option value="K">K</option><option value="S">S</option><option value="L">L</option><option value="XL">XL</option>
                     </select>
                 </div>
                 <button type="submit" class="btn">SIMPAN DATA</button>
@@ -337,232 +130,109 @@
         <!-- 4. Halaman Display Universal -->
         <div id="dataPage" class="card hidden">
             <h3 id="pageTitle" style="color: var(--text-color); margin-bottom: 15px;">Riwayat Data</h3>
-            <div id="dataContainer">
-                <p style="text-align: center; color: #666;">Memuat data...</p>
-            </div>
+            <div id="dataContainer"><p style="text-align: center; color: #666;">Memuat data...</p></div>
             <button type="button" class="btn btn-outline" style="margin-top: 15px;" onclick="showMenu()">KEMBALI KE MENU</button>
         </div>
     </div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZPET_490hOG-x1PM7jdnUCmT9ouvcoYEbWV1QWz3G3rafKSHBD6vt32d9FYD4WXlW/exec";
-    let currentSession = { nrp: "", nama: "" };
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzv2hiFJM0c0BG3Fx7EqR59jl6EjIl5rxHzHWGSfwBEe57CfqkHTqqARkdrpRoI7xJq/exec";
+    let currentSession = { nrp: "", nama: "", role: "user" };
 
-    // Event Listener Terintegrasi
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
-    document.getElementById('kaporlapForm').addEventListener('submit', handleSimpanUkuran);
 
-    // Handle Login Async dengan Spinner & Toast
+    async function sendRequest(payload) {
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        return await response.json();
+    }
+
     async function handleLogin(event) {
         event.preventDefault();
-        const submitBtn = event.target.querySelector('button[type="submit"]');
         const nrp = document.getElementById('loginNrp').value;
         const password = document.getElementById('loginPassword').value;
 
-        setButtonLoading(submitBtn, true, 'Sedang Masuk...');
-
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'login', nrp: nrp, password: password })
-            });
-            const result = await response.json();
-
+            const result = await sendRequest({ action: 'login', nrp: nrp, password: password });
             if (result.status === 'success') {
                 currentSession.nrp = nrp;
                 currentSession.nama = result.nama;
-                document.getElementById('userInfo').innerText = `Prajurit: ${result.nama} (${nrp})`;
-                showToast('Login berhasil! Selamat datang.', 'success');
+                currentSession.role = result.role || 'user';
+                
+                document.getElementById('userInfo').innerText = `${currentSession.role.toUpperCase()}: ${result.nama} (${nrp})`;
+                
+                // Tampilkan Menu Admin jika role = 'admin'
+                if (currentSession.role === 'admin') {
+                    document.getElementById('adminMenuItem').classList.remove('hidden');
+                } else {
+                    document.getElementById('adminMenuItem').classList.add('hidden');
+                }
+
+                showToast('Login berhasil!', 'success');
                 showMenu();
-                checkBadgeSiap();
             } else {
                 showToast(result.message || 'NRP atau Password salah!', 'error');
             }
         } catch (error) {
-            console.error('Error login:', error);
             showToast('Gagal terhubung ke server!', 'error');
-        } finally {
-            setButtonLoading(submitBtn, false);
         }
     }
 
-    // Handle Simpan Ukuran Async dengan Spinner & Toast
-    async function handleSimpanUkuran(event) {
-        event.preventDefault();
-        const submitBtn = event.target.querySelector('button[type="submit"]');
+    // DASHBOARD ADMIN: MENGONTROL PRAJURIT YANG BELUM MENGAMBIL BARANG
+    async function loadAdminControl() {
+        showDisplayPage('Kontrol Pengambilan (Admin)');
+        const container = document.getElementById('dataContainer');
         
-        setButtonLoading(submitBtn, true, 'Menyimpan Data...');
+        try {
+            const res = await sendRequest({ action: 'get_all_kaporlap_siap' });
+            if (res.status === 'success' && res.data.length > 0) {
+                let html = `<p style="font-size:0.8rem; color:#888; margin-bottom:10px;">Total Ada ${res.data.length} Prajurit Belum Mengambil Barang:</p>`;
+                res.data.forEach((item) => {
+                    html += `
+                        <div style="border: 1px solid #FFCDD2; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #FFEBEE;">
+                            <div style="font-weight:bold; color:#D32F2F;">👤 ${item.nama} (${item.nrp})</div>
+                            <div style="font-size:0.85rem; margin-top:4px;"><strong>Barang:</strong> ${item.barang}</div>
+                            <div style="font-size:0.85rem;"><strong>Lokasi:</strong> ${item.lokasi}</div>
+                            <div style="font-size:0.75rem; color:#666; margin-bottom:8px;">Siap sejak: ${item.timestamp}</div>
+                            <button class="btn btn-success" style="font-size:0.8rem; padding:8px;" onclick="konfirmasiPenyerahan(${item.rowId})">
+                                ✅ Tandai Sudah Diambil
+                            </button>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p style="text-align:center; color:#2e7d32; font-weight:bold;">Semua prajurit telah mengambil kaporlap!</p>';
+            }
+        } catch (err) {
+            container.innerHTML = '<p style="text-align:center; color:red;">Gagal memuat data admin.</p>';
+        }
+    }
 
-        const payload = {
-            action: 'simpan_kaporlap',
-            nrp: currentSession.nrp,
-            nama: currentSession.nama,
-            pangkat: document.getElementById('pangkat').value,
-            ukuranPDL: document.getElementById('ukuranPDL').value,
-            ukuranSepatu: document.getElementById('ukuranSepatu').value,
-            ukuranTopi: document.getElementById('ukuranTopi').value,
-            ukuranSepatuOlahraga: document.getElementById('ukuranSepatuOlahraga').value,
-            ukuranPDHS: document.getElementById('ukuranPDHS').value
-        };
+    // ADMIN: AKSI KONFIRMASI PENYERAHAN BARANG
+    async function konfirmasiPenyerahan(rowId) {
+        if (!confirm("Apakah Anda yakin barang ini sudah diserahkan kepada prajurit?")) return;
 
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
+            const res = await sendRequest({
+                action: 'konfirmasi_penyerahan',
+                rowId: rowId,
+                petugas: currentSession.nama
             });
-            const result = await response.json();
 
-            if (result.status === 'success') {
-                showToast('Data ukuran kaporlap berhasil disimpan.', 'success');
-                document.getElementById('kaporlapForm').reset();
-                showMenu();
+            if (res.status === 'success') {
+                showToast(res.message, 'success');
+                loadAdminControl(); // Refresh data setelah di-update
             } else {
-                showToast(result.message || 'Gagal menyimpan data.', 'error');
+                showToast(res.message, 'error');
             }
-        } catch (error) {
-            console.error('Error simpan data:', error);
-            showToast('Gagal terhubung ke server!', 'error');
-        } finally {
-            setButtonLoading(submitBtn, false);
+        } catch (err) {
+            showToast('Gagal memproses konfirmasi.', 'error');
         }
     }
 
-    // Indicator Loading Tombol
-    function setButtonLoading(button, isLoading, textLoading = 'Memproses...') {
-        if (!button) return;
-        if (isLoading) {
-            button.dataset.originalText = button.innerHTML;
-            button.classList.add('btn-loading');
-            button.disabled = true;
-            button.innerHTML = `<span class="spinner"></span> <span>${textLoading}</span>`;
-        } else {
-            button.classList.remove('btn-loading');
-            button.disabled = false;
-            if (button.dataset.originalText) {
-                button.innerHTML = button.dataset.originalText;
-            }
-        }
-    }
-
-    // Toast Notification
-    function showToast(message, type = 'info', duration = 3000) {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-
-        const icons = { success: '✓', error: '✕', info: 'ℹ' };
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.innerHTML = `
-            <span class="toast-icon">${icons[type] || 'ℹ'}</span>
-            <span class="toast-message">${message}</span>
-        `;
-
-        container.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-            toast.addEventListener('transitionend', () => toast.remove());
-        }, duration);
-    }
-
-    // Notifikasi Badge Siap Diambil
-    function checkBadgeSiap() {
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'get_kaporlap_siap', nrp: currentSession.nrp })
-        })
-        .then(res => res.json())
-        .then(res => {
-            if (res.status === 'success' && res.data.length > 0) {
-                const badge = document.getElementById('badgeSiap');
-                badge.innerText = res.data.length;
-                badge.classList.remove('hidden');
-            }
-        })
-        .catch(err => console.error(err));
-    }
-
-    // Load Data Ukuran
-    function loadMyData() {
-        showDisplayPage('Ukuran Saya');
-        const container = document.getElementById('dataContainer');
-        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'get_my_data', nrp: currentSession.nrp }) })
-        .then(res => res.json())
-        .then(res => {
-            if (res.status === 'success' && res.data.length > 0) {
-                let html = '';
-                res.data.forEach((item) => {
-                    html += `
-                        <div style="border: 1px solid #90E0EF; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F0F9FF;">
-                            <div style="font-size:0.8rem; color:#0077B6; font-weight:bold;">📅 ${item.timestamp}</div>
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.85rem; margin-top:8px;">
-                                <div><strong>Pangkat:</strong> ${item.pangkat}</div>
-                                <div><strong>PDL:</strong> ${item.ukuranPDL}</div>
-                                <div><strong>Sepatu PDL:</strong> ${item.ukuranSepatu}</div>
-                                <div><strong>Topi:</strong> ${item.ukuranTopi}</div>
-                                <div><strong>Sepatu OR:</strong> ${item.ukuranSepatuOlahraga}</div>
-                                <div><strong>PDHS:</strong> ${item.ukuranPDHS}</div>
-                            </div>
-                        </div>`;
-                });
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<p style="text-align:center; color:#888;">Belum ada data ukuran.</p>';
-            }
-        });
-    }
-
-    // Load Kaporlap Siap Diambil
-    function loadKaporlapSiap() {
-        showDisplayPage('Kaporlap Siap Diambil');
-        const container = document.getElementById('dataContainer');
-        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'get_kaporlap_siap', nrp: currentSession.nrp }) })
-        .then(res => res.json())
-        .then(res => {
-            if (res.status === 'success' && res.data.length > 0) {
-                let html = '';
-                res.data.forEach((item) => {
-                    html += `
-                        <div style="border: 1px solid #FF9F1C; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #FFF9EC;">
-                            <div style="color: #D47A00; font-weight: bold;">📦 ${item.barang}</div>
-                            <div style="font-size: 0.85rem; margin-top: 5px;"><strong>Lokasi Ambil:</strong> ${item.lokasi}</div>
-                            <div style="font-size: 0.75rem; color: #888; margin-top: 5px;">Siap sejak: ${item.timestamp}</div>
-                        </div>`;
-                });
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<p style="text-align:center; color:#888;">Tidak ada kaporlap yang siap diambil saat ini.</p>';
-            }
-        });
-    }
-
-    // Load Kaporlap Telah Diambil
-    function loadKaporlapDiambil() {
-        showDisplayPage('Riwayat Kaporlap Diambil');
-        const container = document.getElementById('dataContainer');
-        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'get_kaporlap_diambil', nrp: currentSession.nrp }) })
-        .then(res => res.json())
-        .then(res => {
-            if (res.status === 'success' && res.data.length > 0) {
-                let html = '';
-                res.data.forEach((item) => {
-                    html += `
-                        <div style="border: 1px solid #2EC4B6; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #E8FAF8;">
-                            <div style="color: #0E8074; font-weight: bold;">✅ ${item.barang}</div>
-                            <div style="font-size: 0.85rem; margin-top: 5px;"><strong>Petugas Penyerah:</strong> ${item.petugas}</div>
-                            <div style="font-size: 0.75rem; color: #888; margin-top: 5px;">Diambil pada: ${item.timestamp}</div>
-                        </div>`;
-                });
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<p style="text-align:center; color:#888;">Belum ada riwayat pengambilan.</p>';
-            }
-        });
-    }
-
-    // Fungsi Navigasi Tampilan
     function showDisplayPage(title) {
         document.getElementById('pageTitle').innerText = title;
         document.getElementById('dataContainer').innerHTML = '<p style="text-align:center; color:#666;">Memuat data...</p>';
@@ -578,17 +248,24 @@
         document.getElementById('mainMenu').classList.remove('hidden');
     }
 
-    function showForm() {
-        document.getElementById('mainMenu').classList.add('hidden');
-        document.getElementById('formPage').classList.remove('hidden');
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
     function logout() {
-        currentSession = { nrp: "", nama: "" };
+        currentSession = { nrp: "", nama: "", role: "user" };
         document.getElementById('userInfo').innerText = 'Aplikasi Internal Denma Paspampres';
-        document.getElementById('badgeSiap').classList.add('hidden');
+        document.getElementById('adminMenuItem').classList.add('hidden');
         document.getElementById('mainMenu').classList.add('hidden');
-        document.getElementById('formPage').classList.add('hidden');
         document.getElementById('dataPage').classList.add('hidden');
         document.getElementById('loginPage').classList.remove('hidden');
     }
