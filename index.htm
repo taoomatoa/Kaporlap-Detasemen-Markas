@@ -171,10 +171,19 @@
             </form>
         </div>
         
-        <!-- 2. DASHBOARD ADMIN (Kontrol Hak Akses Admin) -->
+        <!-- 2. DASHBOARD ADMIN (Lengkap dengan Pencarian & Refresh) -->
         <div id="adminPanel" class="card hidden">
-            <h3 style="color: var(--text-color); margin-bottom: 15px;">Kontrol Pengambilan Kaporlap</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="color: var(--text-color); font-size: 1.1rem;">Kontrol Pengambilan</h3>
+                <!-- Tombol Refresh Data -->
+                <button type="button" class="btn btn-sm" onclick="loadAdminData()" style="width: auto; background-color: var(--secondary-color);">🔄 Refresh</button>
+            </div>
             
+            <!-- Input Pencarian (Filter NRP / Nama) -->
+            <div class="form-group" style="margin-bottom: 12px;">
+                <input type="text" id="adminSearchInput" class="form-control" placeholder="🔍 Cari NRP atau Nama..." onkeyup="filterAdminList()">
+            </div>
+
             <div class="tab-menu">
                 <button id="tabBelumBtn" class="active" onclick="switchAdminTab('Belum Diambil')">Belum Mengambil</button>
                 <button id="tabSudahBtn" onclick="switchAdminTab('Sudah Diambil')">Sudah Mengambil</button>
@@ -263,6 +272,9 @@
     let allAdminData = [];
     let currentAdminFilter = "Belum Diambil";
 
+
+    
+
     // Event Listener
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
     document.getElementById('kaporlapForm').addEventListener('submit', handleSimpanUkuran);
@@ -309,28 +321,79 @@
         }
     }
 
+    // Global variable untuk menyimpan data & filter
+    let allAdminData = [];
+    let currentAdminFilter = "Belum Diambil";
+
     // Function Admin: Load Data Anggota
     async function loadAdminData() {
         const container = document.getElementById('adminListContainer');
-        container.innerHTML = '<p style="text-align: center; color: #666;">Memuat data...</p>';
+        container.innerHTML = '<p style="text-align: center; color: #666;">Memuat data terbaru...</p>';
 
         try {
             const res = await postToAppsScript({ action: 'get_status_admin' });
             if (res.status === 'success') {
                 allAdminData = res.data;
                 renderAdminList();
+            } else {
+                container.innerHTML = '<p style="text-align: center; color: red;">Gagal mengambil data.</p>';
             }
         } catch (err) {
-            container.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat data.</p>';
+            container.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat data dari server.</p>';
         }
     }
 
-    // Switch Tab Admin Filter
+    // Switch Tab Filter Status
     function switchAdminTab(filter) {
         currentAdminFilter = filter;
         document.getElementById('tabBelumBtn').classList.toggle('active', filter === 'Belum Diambil');
         document.getElementById('tabSudahBtn').classList.toggle('active', filter === 'Sudah Diambil');
         renderAdminList();
+    }
+
+    // Live Filter dari Input Search
+    function filterAdminList() {
+        renderAdminList();
+    }
+
+    // Render Anggota Berdasarkan Tab & Input Pencarian
+    function renderAdminList() {
+        const container = document.getElementById('adminListContainer');
+        const searchQuery = document.getElementById('adminSearchInput').value.toLowerCase().trim();
+
+        // Filter berdasarkan Status + Keyword (NRP / Nama)
+        const filtered = allAdminData.filter(item => {
+            const matchStatus = item.status === currentAdminFilter;
+            const matchQuery = item.nrp.toString().toLowerCase().includes(searchQuery) || 
+                               item.nama.toLowerCase().includes(searchQuery);
+            return matchStatus && matchQuery;
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<p style="text-align: center; color: #888; margin: 20px 0;">Tidak ada data yang cocok.</p>`;
+            return;
+        }
+
+        let html = '';
+        filtered.forEach(item => {
+            const isSudah = item.status === "Sudah Diambil";
+            html += `
+                <div class="member-card">
+                    <div>
+                        <div style="font-weight: bold; color: var(--text-color);">${item.nama}</div>
+                        <div style="font-size: 0.8rem; color: #666;">NRP: <strong>${item.nrp}</strong> | ${item.pangkat}</div>
+                        ${isSudah ? `<div style="font-size: 0.75rem; color: #333; margin-top:2px;">Petugas: ${item.petugas} (${item.tglDiambil})</div>` : ''}
+                    </div>
+                    <div>
+                        ${isSudah 
+                            ? `<button class="btn btn-sm btn-danger" onclick="toggleStatus('${item.nrp}', 'Belum Diambil')">Batalkan</button>`
+                            : `<button class="btn btn-sm btn-success" onclick="toggleStatus('${item.nrp}', 'Sudah Diambil')">Set Diambil</button>`
+                        }
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
     }
 
     // Render Anggota Berdasarkan Tab Admin
