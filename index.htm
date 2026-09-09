@@ -86,7 +86,7 @@
             background: rgba(0,0,0,0.5); display: flex; justify-content: center;
             align-items: center; z-index: 999;
         }
-        .modal-body { width: 90%; max-width: 400px; }
+        .modal-body { width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
 
         .btn-loading { position: relative; pointer-events: none; opacity: 0.8; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         .spinner { width: 16px; height: 16px; border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: #ffffff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
@@ -126,14 +126,14 @@
                 <button type="submit" id="btnLogin" class="btn">MASUK</button>
             </form>
         </div>
-        
+
         <!-- 2. DASHBOARD ADMIN -->
         <div id="adminPanel" class="card hidden">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="color: var(--text-color); font-size: 1.1rem;">Kontrol Pengambilan</h3>
                 <button type="button" class="btn btn-sm" onclick="loadAdminData()" style="width: auto; background-color: var(--secondary-color);">🔄 Refresh</button>
             </div>
-            
+
             <div class="form-group" style="margin-bottom: 12px;">
                 <input type="text" id="adminSearchInput" class="form-control" placeholder="🔍 Cari NRP atau Nama..." onkeyup="filterAdminList()">
             </div>
@@ -143,11 +143,11 @@
                 <button id="tabBelumBtn" onclick="switchAdminTab('Belum Lengkap')">Belum Lengkap</button>
                 <button id="tabSudahBtn" onclick="switchAdminTab('Sudah Lengkap')">Sudah Lengkap</button>
             </div>
-            
+
             <div id="adminListContainer">
                 <p style="text-align: center; color: #666;">Memuat data...</p>
             </div>
-            
+
             <button class="btn btn-outline" style="margin-top:20px;" onclick="logout()">Keluar (Logout)</button>
         </div>
 
@@ -204,7 +204,7 @@
                     <input type="number" id="ukuranSepatuTac" class="form-control" min="38" max="47" placeholder="Contoh: 42" required>
                 </div>
                 <div class="form-group">
-                    <label for="ukuranTutupKepala">Ukuran Topi / Pet / Baret</label>
+                    <label for="ukuranTopi">Ukuran Topi / Pet / Baret</label>
                     <input type="number" id="ukuranTopi" class="form-control" min="53" max="62" placeholder="Contoh: 57" required>
                 </div>
                 <div class="form-group">
@@ -216,7 +216,31 @@
                         <option value="L">L (Besar)</option>
                         <option value="XL">XL (Ekstra Besar)</option>
                         <option value="XXL">XXL (Ekstra-Ekstra Besar)</option>
-                        <option value="XL">XXXL (Ekstra-Ekstra-Ekstra Besar)</option>
+                        <option value="XXXL">XXXL (Ekstra-Ekstra-Ekstra Besar)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ukuranBatik">Ukuran Baju Batik</label>
+                    <select id="ukuranBatik" class="form-control" required>
+                        <option value="">-- Pilih Ukuran --</option>
+                        <option value="K">K (Kecil)</option>
+                        <option value="S">S (Sedang)</option>
+                        <option value="L">L (Besar)</option>
+                        <option value="XL">XL (Ekstra Besar)</option>
+                        <option value="XXL">XXL (Ekstra-Ekstra Besar)</option>
+                        <option value="XXXL">XXXL (Ekstra-Ekstra-Ekstra Besar)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ukuranPSL">Ukuran PSL</label>
+                    <select id="ukuranPSL" class="form-control" required>
+                        <option value="">-- Pilih Ukuran --</option>
+                        <option value="K">K (Kecil)</option>
+                        <option value="S">S (Sedang)</option>
+                        <option value="L">L (Besar)</option>
+                        <option value="XL">XL (Ekstra Besar)</option>
+                        <option value="XXL">XXL (Ekstra-Ekstra Besar)</option>
+                        <option value="XXXL">XXXL (Ekstra-Ekstra-Ekstra Besar)</option>
                     </select>
                 </div>
                 <button type="submit" id="btnSimpan" class="btn">SIMPAN DATA</button>
@@ -239,7 +263,7 @@
     <div class="card modal-body">
         <h3 id="modalMemberName" style="color: var(--text-color); margin-bottom: 2px;">-</h3>
         <p id="modalMemberNrp" style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">-</p>
-        
+
         <form id="checklistForm">
             <input type="hidden" id="modalTargetNrp">
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; font-size: 0.9rem;">
@@ -249,6 +273,8 @@
                 <label><input type="checkbox" name="kaporlapItem" value="Sepatu Tactical"> Sepatu Tactical (<strong id="sizeSepatuTac">-</strong>)</label>
                 <label><input type="checkbox" name="kaporlapItem" value="Topi"> Topi / Pet / Baret (<strong id="sizeTopi">-</strong>)</label>
                 <label><input type="checkbox" name="kaporlapItem" value="Baju Tactical"> Baju Tactical (<strong id="sizeBajuTac">-</strong>)</label>
+                <label><input type="checkbox" name="kaporlapItem" value="Baju Batik"> Baju Batik (<strong id="sizeBatik">-</strong>)</label>
+                <label><input type="checkbox" name="kaporlapItem" value="PSL"> PSL (<strong id="sizePSL">-</strong>)</label>
             </div>
 
             <button type="button" class="btn btn-success" onclick="saveChecklist()">SIMPAN PERUBAHAN</button>
@@ -258,12 +284,12 @@
 </div>
 
 <script>
-    // MASUKKAN URL WEB APP DEPLOYMENT GOOGLE APPS SCRIPT ANDA DI SINI
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjrDv7bROdQkV64tzHx_1h7MCM1CgV3w6WHGk95lruwfJoPVEaFLsn4v33Io5F9q0N/exec";
-    
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdlenp6kJ1d5GYkHKYQYkmt5ZmzTtW_iBhGzRN1wYS_CU0Mo1uM19F6qOfmGj61hnp/exec";
+
     let currentSession = { nrp: "", nama: "", role: "" };
     let allAdminData = [];
     let currentAdminFilter = "Semua";
+    const TOTAL_ITEMS = 8; // Total item kaporlap sekarang berjumlah 8
 
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
     document.getElementById('kaporlapForm').addEventListener('submit', handleSimpanUkuran);
@@ -347,13 +373,13 @@
 
         const filtered = allAdminData.filter(item => {
             const takenCount = item.itemsTaken ? item.itemsTaken.length : 0;
-            const isLengkap = takenCount === 6;
-            
+            const isLengkap = takenCount === TOTAL_ITEMS;
+
             let matchStatus = true;
             if (currentAdminFilter === 'Belum Lengkap') matchStatus = !isLengkap;
             else if (currentAdminFilter === 'Sudah Lengkap') matchStatus = isLengkap;
 
-            const matchQuery = item.nrp.toLowerCase().includes(searchQuery) || 
+            const matchQuery = item.nrp.toLowerCase().includes(searchQuery) ||
                                item.nama.toLowerCase().includes(searchQuery);
             return matchStatus && matchQuery;
         });
@@ -373,11 +399,11 @@
                             <div style="font-weight: bold; color: var(--text-color);">${item.nama || '-'}</div>
                             <div style="font-size: 0.8rem; color: #666;">NRP: <strong>${item.nrp}</strong> | ${item.pangkat || '-'}</div>
                         </div>
-                        <span class="status-badge ${takenCount === 6 ? 'badge-success' : 'badge-warning'}">
-                            ${takenCount}/6 Diambil
+                        <span class="status-badge ${takenCount === TOTAL_ITEMS ? 'badge-success' : 'badge-warning'}">
+                            ${takenCount}/${TOTAL_ITEMS} Diambil
                         </span>
                     </div>
-                    
+
                     <div style="font-size: 0.75rem; color: #444;">
                         <strong>Terambil:</strong> ${item.itemsTaken && item.itemsTaken.length > 0 ? item.itemsTaken.join(', ') : 'Belum ada'}
                     </div>
@@ -405,6 +431,8 @@
         document.getElementById('sizeSepatuTac').innerText = member.sepatuTac || '-';
         document.getElementById('sizeTopi').innerText = member.topi || '-';
         document.getElementById('sizeBajuTac').innerText = member.bajuTac || '-';
+        document.getElementById('sizeBatik').innerText = member.batik || '-';
+        document.getElementById('sizePSL').innerText = member.psl || '-';
 
         const checkboxes = document.querySelectorAll('input[name="kaporlapItem"]');
         checkboxes.forEach(cb => {
@@ -459,7 +487,9 @@
             ukuranSepatuOlahraga: document.getElementById('ukuranSepatuOlahraga').value,
             ukuranSepatuTac: document.getElementById('ukuranSepatuTac').value,
             ukuranTopi: document.getElementById('ukuranTopi').value,
-            ukuranPDHS: document.getElementById('ukuranPDHS').value
+            ukuranPDHS: document.getElementById('ukuranPDHS').value,
+            ukuranBatik: document.getElementById('ukuranBatik').value,
+            ukuranPSL: document.getElementById('ukuranPSL').value
         };
 
         try {
@@ -502,12 +532,14 @@
                         html += `
                             <div style="border: 1px solid #90E0EF; border-radius: 8px; padding: 12px; margin-bottom: 10px; background: #F0F9FF;">
                                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.85rem;">
-                                    <div><strong>PDL:</strong> ${item.ukuranPDL}</div>
-                                    <div><strong>Sepatu PDL:</strong> ${item.ukuranSepatu}</div>
-                                    <div><strong>Sepatu OR:</strong> ${item.ukuranSepatuOlahraga}</div>
-                                    <div><strong>Sepatu Tac:</strong> ${item.ukuranSepatuTac}</div>
-                                    <div><strong>Topi:</strong> ${item.ukuranTopi}</div>
-                                    <div><strong>Baju Tac:</strong> ${item.ukuranPDHS}</div>
+                                    <div><strong>PDL:</strong> ${item.ukuranPDL || '-'}</div>
+                                    <div><strong>Sepatu PDL:</strong> ${item.ukuranSepatu || '-'}</div>
+                                    <div><strong>Sepatu OR:</strong> ${item.ukuranSepatuOlahraga || '-'}</div>
+                                    <div><strong>Sepatu Tac:</strong> ${item.ukuranSepatuTac || '-'}</div>
+                                    <div><strong>Topi:</strong> ${item.ukuranTopi || '-'}</div>
+                                    <div><strong>Baju Tac:</strong> ${item.ukuranPDHS || '-'}</div>
+                                    <div><strong>Batik:</strong> ${item.ukuranBatik || '-'}</div>
+                                    <div><strong>PSL:</strong> ${item.ukuranPSL || '-'}</div>
                                 </div>
                             </div>`;
                     });
