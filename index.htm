@@ -85,7 +85,6 @@
             background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             display: flex;
-            align-items: justify;
             justify-content: center;
             align-items: center;
             font-size: 1.5rem;
@@ -261,27 +260,41 @@
             overflow: hidden;
             border: 2px solid var(--primary-color) !important;
         }
+
+        /* DUA KELAS LOGO DENGAN DUA OPSI LATAR */
         .logo-container {
             display: flex;
-            justify-content: center; /* Posisikan logo tepat di tengah horizontal */
+            justify-content: center;
             align-items: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #1e3c72, #2a5298); /* Background gradient modern */
-            border-radius: 12px; /* Sudut melengkung */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Efek bayangan */
-          }
+            padding: 15px 0;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+        
+        /* Opsi 1: Latar Gradien Biru Modern */
+        .logo-bg-gradient {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Opsi 2: Latar Putih Bersih (Rekomendasi jika logo sudah berwarna gelap) */
+        .logo-bg-white {
+            background: #FFFFFF;
+            border: 1px solid #BEE3F8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
         
         .logo-container img {
-            max-width: 150px; /* Ukuran logo */
+            max-width: 120px;
+            max-height: 120px;
             height: auto;
-          }
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
 
 <div id="toast-container" class="toast-container"></div>
-<div class="logo-container">
-<img src="https://github.com/taoomatoa/Kaporlap-Detasemen-Markas/blob/main/HONGKONG.png?raw=true" alt="Logo">
 
 <div class="mobile-container">
     <div class="header">
@@ -290,6 +303,11 @@
     </div>
 
     <div class="content">
+        <!-- POSISI LOGO DITARUH DI SINI (DITENGAH PADA BAGIAN ATAS ISI KONTEN) -->
+        <div class="logo-container logo-bg-white">
+            <img src="https://github.com/taoomatoa/Kaporlap-Detasemen-Markas/blob/main/HONGKONG.png?raw=true" alt="Logo">
+        </div>
+
         <!-- 1. FORM LOGIN -->
         <div id="loginCard" class="card">
             <h3 style="color: var(--text-color); margin-bottom: 15px; text-align: center;">Login Sistem</h3>
@@ -314,7 +332,7 @@
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 5px; margin-bottom: 15px;">
-                <button type="button" class="btn btn-sm" onclick="openQrScannerModal()" style="background-color: var(--purple-color); color: white;">📷 Scan QR</button>
+                <button type="button" class="btn btn-sm" onclick="openQrScannerModal()" style="background-color: var(--purple-color); color: white;">Scan QR</button>
                 <button type="button" class="btn btn-sm" onclick="openGlobalStockModal()" style="background-color: var(--warning-color);">Stok Global</button>
                 <button type="button" class="btn btn-sm" onclick="loadAdminData()" style="background-color: var(--secondary-color);">Refresh</button>
             </div>
@@ -363,7 +381,7 @@
                     <div>Input Ukuran</div>
                 </div>
                 <div class="menu-item" onclick="loadMyData()">
-                    <div style="font-size: 1.5rem;">📋</div>
+                    <div style="font-size: 1.5rem;">📦</div>
                     <div>Data & Status Saya</div>
                     <!-- BADGE NOTIFIKASI USER -->
                     <span id="userNotifBadge" class="notification-badge hidden">0</span>
@@ -460,7 +478,7 @@
             
             <!-- BANNER NOTIFIKASI AMBIL ITEM -->
             <div id="notifBanner" class="notification-banner hidden">
-                <span>🔔</span>
+                <span>📦</span>
                 <span id="notifBannerText">Ada item yang siap diambil di gudang!</span>
             </div>
 
@@ -683,7 +701,7 @@
                     </div>
 
                     <button class="btn btn-sm" onclick="openItemModal('${item.nrp}')" style="width: 100%; margin-top: 5px;">
-                        📋 Kelola Item & Pengambilan
+                        Kelola Item & Pengambilan
                     </button>
                 </div>
             `;
