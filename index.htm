@@ -326,9 +326,10 @@
                 <button type="button" class="btn-logout-admin" onclick="logout()">Keluar</button>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 5px; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: flex-end; gap: 5px; margin-bottom: 15px; flex-wrap: wrap;">
                 <button type="button" class="btn btn-sm" onclick="openQrScannerModal()" style="background-color: var(--purple-color); color: white;">Scan QR</button>
                 <button type="button" class="btn btn-sm" onclick="openGlobalStockModal()" style="background-color: var(--warning-color);">Stok Global</button>
+                <button type="button" class="btn btn-sm" onclick="openUserMgmtModal()" style="background-color: var(--primary-color);">Kelola User</button>
                 <button type="button" class="btn btn-sm" onclick="loadAdminData()" style="background-color: var(--secondary-color);">Refresh</button>
             </div>
 
@@ -538,8 +539,44 @@
     </div>
 </div>
 
+<!-- MODAL 4: KELOLA USER (TAMBAH & HAPUS USER) -->
+<div id="userMgmtModal" class="modal-overlay hidden">
+    <div class="card modal-body">
+        <h3 style="color: var(--text-color); margin-bottom: 15px;">Kelola Data User</h3>
+        
+        <!-- Form Tambah User -->
+        <form id="addUserForm" onsubmit="handleAddUser(event)" style="border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+            <h4 style="font-size: 0.9rem; margin-bottom: 10px; color: var(--secondary-color);">+ Tambah User Baru</h4>
+            <div class="form-group" style="margin-bottom: 8px;">
+                <input type="text" id="addNrp" class="form-control" placeholder="NRP" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 8px;">
+                <input type="text" id="addNama" class="form-control" placeholder="Nama Lengkap" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 8px;">
+                <input type="password" id="addPassword" class="form-control" placeholder="Password" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <select id="addRole" class="form-control" required>
+                    <option value="User">User</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+            <button type="submit" id="btnAddUser" class="btn btn-sm btn-success" style="width: 100%;">SIMPAN USER</button>
+        </form>
+
+        <!-- Daftar User & Tombol Hapus -->
+        <h4 style="font-size: 0.9rem; margin-bottom: 10px; color: var(--secondary-color);">Daftar User</h4>
+        <div id="userListContainer" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+            <!-- Render via JS -->
+        </div>
+
+        <button type="button" class="btn btn-outline" onclick="closeUserMgmtModal()">TUTUP</button>
+    </div>
+</div>
+
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYuK7SZWFMkGXzFIrqoUemTdSZbIQ3j35wwgApvxUP6GdnH1QUVvgPkt4T_SImrIef/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQ_t3ag-JA1IBA9Nj-D6SLNez4_doGsLz7KBdcnyU4vada_NVDKZkYP2xgy2i5HOy5/exec";
 
     let currentSession = { nrp: "", nama: "", role: "", pangkat: "-" };
     let allAdminData = [];
@@ -552,7 +589,6 @@
     const INACTIVITY_LIMIT = 1 * 60 * 1000; // 1 Menit dalam milidetik
 
     function resetInactivityTimer() {
-        // Jangan jalankan timer jika pengguna belum login
         if (!currentSession.nrp) return;
 
         clearTimeout(inactivityTimer);
@@ -562,7 +598,6 @@
         }, INACTIVITY_LIMIT);
     }
 
-    // Pantau berbagai bentuk interaksi pengguna
     const activityEvents = ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'];
     activityEvents.forEach(event => {
         window.addEventListener(event, resetInactivityTimer, true);
@@ -622,7 +657,6 @@
                     showMenu();
                 }
 
-                // Jalankan timer saat login berhasil
                 resetInactivityTimer();
             } else {
                 showToast(result.message || 'NRP atau Password salah!', 'error');
@@ -649,7 +683,6 @@
                 showMenu();
             }
 
-            // Jalankan timer saat sesi lama dimuat
             resetInactivityTimer();
         }
     });
@@ -749,7 +782,7 @@
             'Sepatu Tactical': member.sepatuTac || '-',
             'Topi': member.topi || '-',
             'Baju Tactical': member.bajuTac || '-',
-            'Baju Batik': member.batik || '-',
+            'Baju Batik': member.bajuBatik || '-',
             'PSL': member.psl || '-'
         };
 
@@ -861,6 +894,94 @@
         }
     }
 
+    /* --- FUNGSI KELOLA USER (TAMBAH & HAPUS USER) --- */
+    function openUserMgmtModal() {
+        renderUserListForMgmt();
+        document.getElementById('userMgmtModal').classList.remove('hidden');
+    }
+
+    function closeUserMgmtModal() {
+        document.getElementById('userMgmtModal').classList.add('hidden');
+    }
+
+    function renderUserListForMgmt() {
+        const container = document.getElementById('userListContainer');
+        if (!allAdminData || allAdminData.length === 0) {
+            container.innerHTML = '<p style="font-size:0.8rem; color:#666;">Tidak ada data user.</p>';
+            return;
+        }
+
+        let html = '';
+        allAdminData.forEach(user => {
+            html += `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 8px 10px; border-radius: 6px; border: 1px solid #E2E8F0;">
+                    <div>
+                        <div style="font-weight: bold; font-size: 0.85rem;">${user.nama || 'Tanpa Nama'}</div>
+                        <div style="font-size: 0.75rem; color: #666;">NRP: ${user.nrp}</div>
+                    </div>
+                    <button type="button" class="btn-logout-admin" style="padding: 4px 8px; font-size: 0.7rem;" onclick="handleDeleteUser('${user.nrp}', '${user.nama || user.nrp}')">
+                        Hapus
+                    </button>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    async function handleAddUser(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnAddUser');
+        setButtonLoading(btn, true, 'Menyimpan...');
+
+        const payload = {
+            action: 'tambah_user',
+            nrp: document.getElementById('addNrp').value.trim(),
+            nama: document.getElementById('addNama').value.trim(),
+            password: document.getElementById('addPassword').value,
+            role: document.getElementById('addRole').value
+        };
+
+        try {
+            const res = await postToAppsScript(payload);
+            if (res.status === 'success') {
+                showToast(res.message, 'success');
+                document.getElementById('addUserForm').reset();
+                await loadAdminData();
+                renderUserListForMgmt();
+            } else {
+                showToast(res.message, 'error');
+            }
+        } catch (err) {
+            showToast('Gagal menambahkan user!', 'error');
+        } finally {
+            setButtonLoading(btn, false);
+        }
+    }
+
+    async function handleDeleteUser(nrp, nama) {
+        if (!confirm(`Apakah Anda yakin ingin menghapus user ${nama} (${nrp})?`)) {
+            return;
+        }
+
+        try {
+            showToast('Menghapus user...', 'info');
+            const res = await postToAppsScript({
+                action: 'hapus_user',
+                targetNrp: nrp
+            });
+
+            if (res.status === 'success') {
+                showToast(res.message, 'success');
+                await loadAdminData();
+                renderUserListForMgmt();
+            } else {
+                showToast(res.message, 'error');
+            }
+        } catch (err) {
+            showToast('Gagal menghapus user!', 'error');
+        }
+    }
+
     /* --- FUNGSI SCANNER QR ADMIN --- */
     function openQrScannerModal() {
         document.getElementById('qrScannerModal').classList.remove('hidden');
@@ -967,7 +1088,6 @@
     async function checkUserNotifications() {
         if (currentSession.role === 'Admin') return;
 
-        // Update Tampilan Kartu Identitas
         document.getElementById('userCardNama').innerText = currentSession.nama || '-';
         document.getElementById('userCardNrp').innerText = currentSession.nrp || '-';
         document.getElementById('userCardPangkat').innerText = `Pangkat: ${currentSession.pangkat || '-'}`;
@@ -984,7 +1104,6 @@
                     document.getElementById('userCardPangkat').innerText = `Pangkat: ${res.data[0].pangkat}`;
                 }
 
-                // Barang tersedia tetapi belum diambil
                 const readyToPickCount = availableItems.filter(item => !takenItems.includes(item)).length;
                 
                 const badgeElement = document.getElementById('userNotifBadge');
@@ -1040,10 +1159,8 @@
                     const takenItems = res.itemsTaken || [];
                     const availableItems = res.availableItems || [];
 
-                    // Hitung item yang siap diambil tapi belum di-scan admin
                     const readyToPickCount = availableItems.filter(item => !takenItems.includes(item)).length;
 
-                    // Update Tampilan Banner Notifikasi jika ada barang ready
                     if (readyToPickCount > 0) {
                         notifBannerText.innerText = `Ada ${readyToPickCount} item yang siap diambil di gudang! Tunjukkan QR Code ke admin.`;
                         notifBanner.classList.remove('hidden');
@@ -1051,7 +1168,6 @@
                         notifBanner.classList.add('hidden');
                     }
 
-                    // Update Lencana Notifikasi Menu
                     const badgeElement = document.getElementById('userNotifBadge');
                     if (readyToPickCount > 0) {
                         badgeElement.innerText = readyToPickCount;
@@ -1123,7 +1239,7 @@
     }
 
     function logout() {
-        clearTimeout(inactivityTimer); // Hentikan timer saat logout
+        clearTimeout(inactivityTimer);
         localStorage.removeItem('kaporlap_session');
         currentSession = { nrp: "", nama: "", role: "", pangkat: "-" };
         document.getElementById('loginForm').reset();
