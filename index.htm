@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Pendataan Kaporlap</title>
+    <!-- Library Generator QR Code (User) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Library Scanner QR Code (Admin) -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
             --primary-color: #00A8FF;
@@ -15,6 +19,7 @@
             --danger-color: #c62828;
             --warning-color: #ef6c00;
             --info-color: #0288d1;
+            --purple-color: #6f42c1;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
@@ -38,6 +43,31 @@
         .card {
             background: white; padding: 20px; border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #BEE3F8; margin-bottom: 15px;
+        }
+
+        /* HEADER KHUSUS ADMIN DI TOPBAR */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #E2E8F0;
+        }
+
+        .btn-logout-admin {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-logout-admin:hover {
+            background-color: #b71c1c;
         }
 
         .form-group { margin-bottom: 15px; }
@@ -79,7 +109,6 @@
         .item-status-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
         .item-status-card { display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 10px 12px; border-radius: 8px; border: 1px solid #E2E8F0; }
 
-        /* TAMPILAN ITEM DI MODAL ADMIN */
         .admin-item-row {
             display: flex;
             justify-content: space-between;
@@ -119,6 +148,26 @@
         .toast-success { background: var(--success-color); }
         .toast-error { background: var(--danger-color); }
         .toast-info { background: var(--secondary-color); }
+
+        /* QR CONTAINER STYLES */
+        .qr-card {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #F4FBFF;
+            border-radius: 10px;
+            border: 1px dashed var(--primary-color);
+        }
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0;
+        }
+        #qr-reader {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid var(--primary-color) !important;
+        }
     </style>
 </head>
 <body>
@@ -127,7 +176,7 @@
 
 <div class="mobile-container">
     <div class="header">
-        <h2>KAWAN KAPORLAP</h2>
+        <h2>PENDATAAN KAPORLAP</h2>
         <div id="userInfo" class="user-info">Aplikasi Internal Denma Paspampres</div>
     </div>
 
@@ -150,16 +199,20 @@
 
         <!-- 2. DASHBOARD ADMIN -->
         <div id="adminPanel" class="card hidden">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <!-- HEADER ADMIN DENGAN TOMBOL LOGOUT -->
+            <div class="admin-header">
                 <h3 style="color: var(--text-color); font-size: 1.1rem;">Kontrol Pengambilan</h3>
-                <div style="display: flex; gap: 5px;">
-                    <button type="button" class="btn btn-sm" onclick="openGlobalStockModal()" style="background-color: var(--warning-color);">⚙️ Stok Global</button>
-                    <button type="button" class="btn btn-sm" onclick="loadAdminData()" style="background-color: var(--secondary-color);">🔄 Refresh</button>
-                </div>
+                <button type="button" class="btn-logout-admin" onclick="logout()">Keluar</button>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 5px; margin-bottom: 15px;">
+                <button type="button" class="btn btn-sm" onclick="openQrScannerModal()" style="background-color: var(--purple-color); color: white;">📷 Scan QR</button>
+                <button type="button" class="btn btn-sm" onclick="openGlobalStockModal()" style="background-color: var(--warning-color);">Stok Global</button>
+                <button type="button" class="btn btn-sm" onclick="loadAdminData()" style="background-color: var(--secondary-color);">Refresh</button>
             </div>
 
             <div class="form-group" style="margin-bottom: 12px;">
-                <input type="text" id="adminSearchInput" class="form-control" placeholder="🔍 Cari NRP atau Nama..." onkeyup="filterAdminList()">
+                <input type="text" id="adminSearchInput" class="form-control" placeholder="Cari NRP atau Nama..." onkeyup="filterAdminList()">
             </div>
 
             <div class="tab-menu">
@@ -171,15 +224,13 @@
             <div id="adminListContainer">
                 <p style="text-align: center; color: #666;">Memuat data...</p>
             </div>
-
-            <button class="btn btn-outline" style="margin-top:20px;" onclick="logout()">Keluar (Logout)</button>
         </div>
 
         <!-- 3. MENU USER -->
         <div id="mainMenu" class="hidden">
             <div class="menu-grid">
                 <div class="menu-item" onclick="showForm()">
-                    <div style="font-size: 1.5rem;">👕</div>
+                    <div style="font-size: 1.5rem;">📝</div>
                     <div>Input Ukuran</div>
                 </div>
                 <div class="menu-item" onclick="loadMyData()">
@@ -272,9 +323,17 @@
             </form>
         </div>
 
-        <!-- 5. TAMPILAN STATUS USER -->
+        <!-- 5. TAMPILAN STATUS & QR USER -->
         <div id="dataPage" class="card hidden">
             <h3 style="color: var(--text-color); margin-bottom: 15px;">Status & Ukuran Saya</h3>
+            
+            <!-- QR CODE USER -->
+            <div class="qr-card">
+                <div style="font-size: 0.85rem; font-weight: bold; color: var(--secondary-color);">QR Code Verifikasi Pengambilan</div>
+                <div id="qrcode"></div>
+                <small style="color: #666; font-size: 0.75rem;">Tunjukkan QR Code ini kepada petugas admin untuk scan pengambilan item.</small>
+            </div>
+
             <div id="userStatusContainer" style="margin-bottom: 15px;"></div>
             <div id="dataContainer"></div>
             <button type="button" class="btn btn-outline" style="margin-top: 15px;" onclick="showMenu()">KEMBALI KE MENU</button>
@@ -323,12 +382,23 @@
     </div>
 </div>
 
+<!-- MODAL 3: SCANNER QR CODE ADMIN -->
+<div id="qrScannerModal" class="modal-overlay hidden">
+    <div class="card modal-body" style="text-align: center;">
+        <h3 style="color: var(--text-color); margin-bottom: 5px;">Scan QR Code Anggota</h3>
+        <p style="font-size: 0.78rem; color: #666; margin-bottom: 15px;">Arahkan kamera ke QR Code di layar HP anggota.</p>
+        <div id="qr-reader" style="width: 100%; max-width: 300px; margin: 0 auto;"></div>
+        <button type="button" class="btn btn-outline" style="margin-top: 15px;" onclick="closeQrScannerModal()">BATAL</button>
+    </div>
+</div>
+
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYuK7SZWFMkGXzFIrqoUemTdSZbIQ3j35wwgApvxUP6GdnH1QUVvgPkt4T_SImrIef/exec";
 
     let currentSession = { nrp: "", nama: "", role: "" };
     let allAdminData = [];
     let currentAdminFilter = "Semua";
+    let html5QrcodeScanner = null;
     const TOTAL_ITEMS = 8;
 
     const ALL_ITEMS_MASTER = [
@@ -393,12 +463,10 @@
         }
     }
 
-    // CEK SESI SAAT HALAMAN DI-REFRESH
     window.addEventListener('DOMContentLoaded', () => {
         const savedSession = localStorage.getItem('kaporlap_session');
         
         if (savedSession) {
-            // Jika ada data login tersimpan, muat ulang sesi secara otomatis
             currentSession = JSON.parse(savedSession);
             document.getElementById('userInfo').innerText = `${currentSession.nama} (${currentSession.role})`;
             
@@ -489,10 +557,12 @@
         container.innerHTML = html;
     }
 
-    /* BUKA MODAL PENGATURAN ITEM PER PERSONEL */
     function openItemModal(nrp) {
         const member = allAdminData.find(m => m.nrp.toString() === nrp.toString());
-        if (!member) return;
+        if (!member) {
+            showToast(`Data anggota dengan NRP ${nrp} tidak ditemukan!`, 'error');
+            return;
+        }
 
         document.getElementById('modalTargetNrp').value = member.nrp;
         document.getElementById('modalMemberName').innerText = member.nama;
@@ -575,7 +645,6 @@
         }
     }
 
-    /* BUKA MODAL PENGATURAN STOK GLOBAL */
     function openGlobalStockModal() {
         let html = '';
         ALL_ITEMS_MASTER.forEach(item => {
@@ -618,6 +687,69 @@
         }
     }
 
+    /* --- FUNGSI SCANNER QR ADMIN --- */
+    function openQrScannerModal() {
+        document.getElementById('qrScannerModal').classList.remove('hidden');
+        
+        html5QrcodeScanner = new Html5Qrcode("qr-reader");
+        html5QrcodeScanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 220, height: 220 } },
+            onScanSuccess,
+            onScanFailure
+        ).catch(err => {
+            showToast("Gagal mengakses kamera!", "error");
+            closeQrScannerModal();
+        });
+    }
+
+    function onScanSuccess(decodedText) {
+        try {
+            const data = JSON.parse(decodedText);
+            if (data && data.type === "KAPORLAP_USER" && data.nrp) {
+                closeQrScannerModal();
+                showToast(`NRP Ditemukan: ${data.nrp}`, 'success');
+                openItemModal(data.nrp);
+            } else {
+                showToast("Format QR Code tidak valid!", "error");
+            }
+        } catch (e) {
+            showToast("QR Code tidak dikenali!", "error");
+        }
+    }
+
+    function onScanFailure(error) {
+        // Abaikan scan frame error berulang
+    }
+
+    function closeQrScannerModal() {
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.stop().then(() => {
+                html5QrcodeScanner.clear();
+                document.getElementById('qrScannerModal').classList.add('hidden');
+            }).catch(() => {
+                document.getElementById('qrScannerModal').classList.add('hidden');
+            });
+        } else {
+            document.getElementById('qrScannerModal').classList.add('hidden');
+        }
+    }
+
+    /* --- FUNGSI GENERATE QR USER --- */
+    function generateUserQrCode(nrp) {
+        const qrElement = document.getElementById("qrcode");
+        qrElement.innerHTML = "";
+        
+        new QRCode(qrElement, {
+            text: JSON.stringify({ type: "KAPORLAP_USER", nrp: nrp }),
+            width: 160,
+            height: 160,
+            colorDark: "#0077B6",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
     async function handleSimpanUkuran(e) {
         e.preventDefault();
         const submitBtn = document.getElementById('btnSimpan');
@@ -656,6 +788,8 @@
 
     async function loadMyData() {
         showDisplayPage();
+        generateUserQrCode(currentSession.nrp);
+
         const container = document.getElementById('dataContainer');
         const statusContainer = document.getElementById('userStatusContainer');
         container.innerHTML = '<p style="text-align:center; color:#666;">Memuat data...</p>';
@@ -750,7 +884,7 @@
     }
 
     function logout() {
-        localStorage.removeItem('kaporlap_session'); // Hapus sesi tersimpan
+        localStorage.removeItem('kaporlap_session');
         currentSession = { nrp: "", nama: "", role: "" };
         document.getElementById('loginForm').reset();
         document.getElementById('userInfo').innerText = 'Aplikasi Internal Denma Paspampres';
