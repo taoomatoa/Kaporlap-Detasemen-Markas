@@ -567,6 +567,12 @@
 
         <!-- Daftar User & Tombol Hapus -->
         <h4 style="font-size: 0.9rem; margin-bottom: 10px; color: var(--secondary-color);">Daftar User</h4>
+        
+        <!-- INPUT PENCARIAN USER -->
+        <div class="form-group" style="margin-bottom: 10px;">
+            <input type="text" id="userSearchInput" class="form-control" placeholder="Cari NRP atau Nama User..." onkeyup="renderUserListForMgmt()">
+        </div>
+
         <div id="userListContainer" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
             <!-- Render via JS -->
         </div>
@@ -894,8 +900,10 @@
         }
     }
 
-    /* --- FUNGSI KELOLA USER (TAMBAH & HAPUS USER) --- */
+    /* --- FUNGSI KELOLA USER (TAMBAH, FILTER/SEARCH & HAPUS USER) --- */
     function openUserMgmtModal() {
+        const searchInput = document.getElementById('userSearchInput');
+        if (searchInput) searchInput.value = ''; // Reset input pencarian saat modal dibuka
         renderUserListForMgmt();
         document.getElementById('userMgmtModal').classList.remove('hidden');
     }
@@ -906,13 +914,28 @@
 
     function renderUserListForMgmt() {
         const container = document.getElementById('userListContainer');
+        const searchInput = document.getElementById('userSearchInput');
+        const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
         if (!allAdminData || allAdminData.length === 0) {
             container.innerHTML = '<p style="font-size:0.8rem; color:#666;">Tidak ada data user.</p>';
             return;
         }
 
+        // Filter user berdasarkan input pencarian (NRP atau Nama)
+        const filteredUsers = allAdminData.filter(user => {
+            const nrpMatch = user.nrp ? user.nrp.toString().toLowerCase().includes(searchQuery) : false;
+            const namaMatch = user.nama ? user.nama.toLowerCase().includes(searchQuery) : false;
+            return nrpMatch || namaMatch;
+        });
+
+        if (filteredUsers.length === 0) {
+            container.innerHTML = '<p style="font-size:0.8rem; color:#888; text-align:center;">User tidak ditemukan.</p>';
+            return;
+        }
+
         let html = '';
-        allAdminData.forEach(user => {
+        filteredUsers.forEach(user => {
             html += `
                 <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 8px 10px; border-radius: 6px; border: 1px solid #E2E8F0;">
                     <div>
