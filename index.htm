@@ -45,6 +45,67 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #BEE3F8; margin-bottom: 15px;
         }
 
+        /* TAMPILAN KARTU ANGGOTA USER */
+        .profile-id-card {
+            background: linear-gradient(135deg, #0077B6, #00A8FF);
+            color: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 119, 182, 0.25);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-id-card::after {
+            content: "";
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .profile-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: justify;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .profile-info { flex: 1; }
+        .profile-name { font-weight: bold; font-size: 1.05rem; letter-spacing: 0.3px; line-height: 1.2; }
+        .profile-rank { font-size: 0.85rem; opacity: 0.9; margin-top: 2px; }
+
+        .profile-card-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 0.8rem;
+        }
+
+        .profile-nrp-label { opacity: 0.8; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .profile-nrp-value { font-size: 0.95rem; font-weight: bold; font-family: 'Courier New', Courier, monospace; letter-spacing: 1px; }
+
         /* HEADER KHUSUS ADMIN DI TOPBAR */
         .admin-header {
             display: flex;
@@ -65,9 +126,6 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
-        }
-        .btn-logout-admin:hover {
-            background-color: #b71c1c;
         }
 
         .form-group { margin-bottom: 15px; }
@@ -185,7 +243,6 @@
         .toast-error { background: var(--danger-color); }
         .toast-info { background: var(--secondary-color); }
 
-        /* QR CONTAINER STYLES */
         .qr-card {
             text-align: center;
             margin-bottom: 15px;
@@ -261,8 +318,29 @@
             </div>
         </div>
 
-        <!-- 3. MENU USER -->
+        <!-- 3. MENU USER & KARTU PROFIL -->
         <div id="mainMenu" class="hidden">
+            <!-- KARTU PROFIL ANGGOTA -->
+            <div class="profile-id-card">
+                <div class="profile-card-header">
+                    <div class="profile-avatar">👤</div>
+                    <div class="profile-info">
+                        <div id="userCardNama" class="profile-name">MEMUAT...</div>
+                        <div id="userCardPangkat" class="profile-rank">Pangkat: -</div>
+                    </div>
+                </div>
+                <div class="profile-card-body">
+                    <div>
+                        <div class="profile-nrp-label">NRP ANGGOTA</div>
+                        <div id="userCardNrp" class="profile-nrp-value">-</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 0.68rem; background: rgba(255,255,255,0.25); padding: 3px 8px; border-radius: 10px; text-transform: uppercase;">Personel Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MENU UTAMA -->
             <div class="menu-grid">
                 <div class="menu-item" onclick="showForm()">
                     <div style="font-size: 1.5rem;">📝</div>
@@ -434,7 +512,7 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYuK7SZWFMkGXzFIrqoUemTdSZbIQ3j35wwgApvxUP6GdnH1QUVvgPkt4T_SImrIef/exec";
 
-    let currentSession = { nrp: "", nama: "", role: "" };
+    let currentSession = { nrp: "", nama: "", role: "", pangkat: "-" };
     let allAdminData = [];
     let currentAdminFilter = "Semua";
     let html5QrcodeScanner = null;
@@ -478,6 +556,7 @@
                 currentSession.nrp = nrp;
                 currentSession.nama = result.nama;
                 currentSession.role = result.role;
+                currentSession.pangkat = result.pangkat || '-';
 
                 localStorage.setItem('kaporlap_session', JSON.stringify(currentSession));
 
@@ -794,11 +873,12 @@
         const submitBtn = document.getElementById('btnSimpan');
         setButtonLoading(submitBtn, true, 'Menyimpan...');
 
+        const pangkatVal = document.getElementById('pangkat').value;
         const payload = {
             action: 'simpan_kaporlap',
             nrp: currentSession.nrp,
             nama: currentSession.nama,
-            pangkat: document.getElementById('pangkat').value,
+            pangkat: pangkatVal,
             ukuranPDL: document.getElementById('ukuranPDL').value,
             ukuranSepatu: document.getElementById('ukuranSepatu').value,
             ukuranSepatuOlahraga: document.getElementById('ukuranSepatuOlahraga').value,
@@ -813,6 +893,8 @@
             const res = await postToAppsScript(payload);
             if (res.status === 'success') {
                 showToast(res.message, 'success');
+                currentSession.pangkat = pangkatVal;
+                localStorage.setItem('kaporlap_session', JSON.stringify(currentSession));
                 document.getElementById('kaporlapForm').reset();
                 showMenu();
             } else {
@@ -825,16 +907,27 @@
         }
     }
 
-    /* --- FUNGSI CEK NOTIFIKASI DI MENU UTAMA USER --- */
+    /* --- FUNGSI CEK NOTIFIKASI & UPDATE KARTU PROFIL USER --- */
     async function checkUserNotifications() {
         if (currentSession.role === 'Admin') return;
-        
+
+        // Update Tampilan Kartu Identitas
+        document.getElementById('userCardNama').innerText = currentSession.nama || '-';
+        document.getElementById('userCardNrp').innerText = currentSession.nrp || '-';
+        document.getElementById('userCardPangkat').innerText = `Pangkat: ${currentSession.pangkat || '-'}`;
+
         try {
             const res = await postToAppsScript({ action: 'get_my_data', nrp: currentSession.nrp });
             if (res.status === 'success') {
                 const takenItems = res.itemsTaken || [];
                 const availableItems = res.availableItems || [];
                 
+                if (res.data && res.data.length > 0 && res.data[0].pangkat) {
+                    currentSession.pangkat = res.data[0].pangkat;
+                    localStorage.setItem('kaporlap_session', JSON.stringify(currentSession));
+                    document.getElementById('userCardPangkat').innerText = `Pangkat: ${res.data[0].pangkat}`;
+                }
+
                 // Barang tersedia tetapi belum diambil
                 const readyToPickCount = availableItems.filter(item => !takenItems.includes(item)).length;
                 
@@ -975,7 +1068,7 @@
 
     function logout() {
         localStorage.removeItem('kaporlap_session');
-        currentSession = { nrp: "", nama: "", role: "" };
+        currentSession = { nrp: "", nama: "", role: "", pangkat: "-" };
         document.getElementById('loginForm').reset();
         document.getElementById('userInfo').innerText = 'Aplikasi Internal Denma Paspampres';
         hideAllPages();
