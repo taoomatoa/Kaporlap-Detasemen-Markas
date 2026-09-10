@@ -1,0 +1,21 @@
+{
+  "short_name": "SiLOGIX",
+  "name": "SiLOGIX DENMA - Sistem Kaporlap",
+  "icons": [
+    {
+      "src": "https://github.com/taoomatoa/Kaporlap-Detasemen-Markas/blob/main/1786006523962.png?raw=true",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://github.com/taoomatoa/Kaporlap-Detasemen-Markas/blob/main/1786006523962.png?raw=true",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#E0F7FA",
+  "theme_color": "#00A8FF",
+  "display": "standalone",
+  "orientation": "portrait"
+}
