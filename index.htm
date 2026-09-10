@@ -89,6 +89,42 @@
             background: #E0F7FA; border: 1px solid #90E0EF; padding: 15px 10px;
             border-radius: 12px; text-align: center; cursor: pointer;
             color: var(--text-color); font-weight: bold; font-size: 0.85rem;
+            position: relative;
+        }
+
+        /* BADGE NOTIFIKASI */
+        .notification-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            padding: 4px 8px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .notification-banner {
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: var(--danger-color);
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 0.82rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .tab-menu { display: flex; gap: 6px; margin-bottom: 15px; }
@@ -199,7 +235,6 @@
 
         <!-- 2. DASHBOARD ADMIN -->
         <div id="adminPanel" class="card hidden">
-            <!-- HEADER ADMIN DENGAN TOMBOL LOGOUT -->
             <div class="admin-header">
                 <h3 style="color: var(--text-color); font-size: 1.1rem;">Kontrol Pengambilan</h3>
                 <button type="button" class="btn-logout-admin" onclick="logout()">Keluar</button>
@@ -236,6 +271,8 @@
                 <div class="menu-item" onclick="loadMyData()">
                     <div style="font-size: 1.5rem;">📋</div>
                     <div>Data & Status Saya</div>
+                    <!-- BADGE NOTIFIKASI USER -->
+                    <span id="userNotifBadge" class="notification-badge hidden">0</span>
                 </div>
             </div>
             <button class="btn btn-outline" style="margin-top:20px;" onclick="logout()">Keluar (Logout)</button>
@@ -327,6 +364,12 @@
         <div id="dataPage" class="card hidden">
             <h3 style="color: var(--text-color); margin-bottom: 15px;">Status & Ukuran Saya</h3>
             
+            <!-- BANNER NOTIFIKASI AMBIL ITEM -->
+            <div id="notifBanner" class="notification-banner hidden">
+                <span>🔔</span>
+                <span id="notifBannerText">Ada item yang siap diambil di gudang!</span>
+            </div>
+
             <!-- QR CODE USER -->
             <div class="qr-card">
                 <div style="font-size: 0.85rem; font-weight: bold; color: var(--secondary-color);">QR Code Verifikasi Pengambilan</div>
@@ -355,9 +398,7 @@
                 <span>TERSEDIA | AMBIL</span>
             </div>
 
-            <div id="modalItemsList" style="display: flex; flex-direction: column; gap: 8px; margin: 10px 0 20px 0; font-size: 0.85rem;">
-                <!-- Dikelola via JS -->
-            </div>
+            <div id="modalItemsList" style="display: flex; flex-direction: column; gap: 8px; margin: 10px 0 20px 0; font-size: 0.85rem;"></div>
 
             <button type="button" class="btn btn-success" onclick="saveChecklist()">SIMPAN PERUBAHAN</button>
             <button type="button" class="btn btn-outline" onclick="closeItemModal()">BATAL</button>
@@ -372,9 +413,7 @@
         <p style="font-size: 0.78rem; color: #666; margin-bottom: 15px;">Tentukan item yang sudah siap diambil di gudang secara umum.</p>
 
         <form id="globalStockForm">
-            <div id="globalItemsList" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; font-size: 0.88rem;">
-                <!-- Dikelola via JS -->
-            </div>
+            <div id="globalItemsList" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; font-size: 0.88rem;"></div>
 
             <button type="button" class="btn btn-success" onclick="saveGlobalStock()">SIMPAN KETERSEDIAAN STOK</button>
             <button type="button" class="btn btn-outline" onclick="closeGlobalStockModal()">BATAL</button>
@@ -786,12 +825,41 @@
         }
     }
 
+    /* --- FUNGSI CEK NOTIFIKASI DI MENU UTAMA USER --- */
+    async function checkUserNotifications() {
+        if (currentSession.role === 'Admin') return;
+        
+        try {
+            const res = await postToAppsScript({ action: 'get_my_data', nrp: currentSession.nrp });
+            if (res.status === 'success') {
+                const takenItems = res.itemsTaken || [];
+                const availableItems = res.availableItems || [];
+                
+                // Barang tersedia tetapi belum diambil
+                const readyToPickCount = availableItems.filter(item => !takenItems.includes(item)).length;
+                
+                const badgeElement = document.getElementById('userNotifBadge');
+                if (readyToPickCount > 0) {
+                    badgeElement.innerText = readyToPickCount;
+                    badgeElement.classList.remove('hidden');
+                } else {
+                    badgeElement.classList.add('hidden');
+                }
+            }
+        } catch (err) {
+            console.log("Gagal mengecek notifikasi");
+        }
+    }
+
     async function loadMyData() {
         showDisplayPage();
         generateUserQrCode(currentSession.nrp);
 
         const container = document.getElementById('dataContainer');
         const statusContainer = document.getElementById('userStatusContainer');
+        const notifBanner = document.getElementById('notifBanner');
+        const notifBannerText = document.getElementById('notifBannerText');
+        
         container.innerHTML = '<p style="text-align:center; color:#666;">Memuat data...</p>';
 
         try {
@@ -823,6 +891,26 @@
                     const takenItems = res.itemsTaken || [];
                     const availableItems = res.availableItems || [];
 
+                    // Hitung item yang siap diambil tapi belum di-scan admin
+                    const readyToPickCount = availableItems.filter(item => !takenItems.includes(item)).length;
+
+                    // Update Tampilan Banner Notifikasi jika ada barang ready
+                    if (readyToPickCount > 0) {
+                        notifBannerText.innerText = `Ada ${readyToPickCount} item yang siap diambil di gudang! Tunjukkan QR Code ke admin.`;
+                        notifBanner.classList.remove('hidden');
+                    } else {
+                        notifBanner.classList.add('hidden');
+                    }
+
+                    // Update Lencana Notifikasi Menu
+                    const badgeElement = document.getElementById('userNotifBadge');
+                    if (readyToPickCount > 0) {
+                        badgeElement.innerText = readyToPickCount;
+                        badgeElement.classList.remove('hidden');
+                    } else {
+                        badgeElement.classList.add('hidden');
+                    }
+
                     let html = `<div class="item-status-grid">`;
                     listItems.forEach(item => {
                         const isTaken = takenItems.includes(item.key);
@@ -851,6 +939,7 @@
                     container.innerHTML = html;
                 } else {
                     container.innerHTML = '<p style="text-align:center; color:#666;">Belum ada data ukuran yang dimasukkan.</p>';
+                    notifBanner.classList.add('hidden');
                 }
             } else {
                 container.innerHTML = '<p style="text-align:center; color:red;">Gagal mengambil data saya.</p>';
@@ -863,6 +952,7 @@
     function showMenu() {
         hideAllPages();
         document.getElementById('mainMenu').classList.remove('hidden');
+        checkUserNotifications();
     }
 
     function showForm() {
