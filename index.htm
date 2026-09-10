@@ -261,11 +261,27 @@
             overflow: hidden;
             border: 2px solid var(--primary-color) !important;
         }
+        .logo-container {
+            display: flex;
+            justify-content: center; /* Posisikan logo tepat di tengah horizontal */
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298); /* Background gradient modern */
+            border-radius: 12px; /* Sudut melengkung */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Efek bayangan */
+          }
+        
+        .logo-container img {
+            max-width: 150px; /* Ukuran logo */
+            height: auto;
+          }
     </style>
 </head>
 <body>
 
 <div id="toast-container" class="toast-container"></div>
+<div class="logo-container">
+<img src="link-logo-kamu.png" alt="Logo">
 
 <div class="mobile-container">
     <div class="header">
