@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Pendataan Kaporlap</title>
+
+    <!-- TAG PWA (PROGRESSIVE WEB APP) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00A8FF">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SiLOGIX">
+    <link rel="apple-touch-icon" href="https://github.com/taoomatoa/Kaporlap-Detasemen-Markas/blob/main/1786006523962.png?raw=true">
+
     <!-- Library Generator QR Code (User) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Library Scanner QR Code (Admin) -->
@@ -373,7 +382,7 @@
             <!-- MENU UTAMA -->
             <div class="menu-grid">
                 <div class="menu-item" onclick="showForm()">
-                    <div style="font-size: 1.5rem;">📝</div>
+                    <div style="font-size: 1.5rem;">📋</div>
                     <div>Input Ukuran</div>
                 </div>
                 <div class="menu-item" onclick="loadMyData()">
@@ -903,7 +912,7 @@
     /* --- FUNGSI KELOLA USER (TAMBAH, FILTER/SEARCH & HAPUS USER) --- */
     function openUserMgmtModal() {
         const searchInput = document.getElementById('userSearchInput');
-        if (searchInput) searchInput.value = ''; // Reset input pencarian saat modal dibuka
+        if (searchInput) searchInput.value = ''; 
         renderUserListForMgmt();
         document.getElementById('userMgmtModal').classList.remove('hidden');
     }
@@ -922,7 +931,6 @@
             return;
         }
 
-        // Filter user berdasarkan input pencarian (NRP atau Nama)
         const filteredUsers = allAdminData.filter(user => {
             const nrpMatch = user.nrp ? user.nrp.toString().toLowerCase().includes(searchQuery) : false;
             const namaMatch = user.nama ? user.nama.toLowerCase().includes(searchQuery) : false;
@@ -1295,6 +1303,15 @@
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
         }, 3000);
+    }
+
+    /* --- PENDAFTARAN SERVICE WORKER PWA --- */
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(reg => console.log('Service Worker PWA terdaftar!'))
+                .catch(err => console.log('Gagal mendaftarkan Service Worker:', err));
+        });
     }
 </script>
 </body>
