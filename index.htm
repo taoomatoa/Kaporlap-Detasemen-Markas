@@ -547,6 +547,27 @@
     let html5QrcodeScanner = null;
     const TOTAL_ITEMS = 8;
 
+    /* --- LOGIKA FITUR AUTO LOGOUT (INACTIVITY TIMER) --- */
+    let inactivityTimer;
+    const INACTIVITY_LIMIT = 1 * 60 * 1000; // 1 Menit dalam milidetik
+
+    function resetInactivityTimer() {
+        // Jangan jalankan timer jika pengguna belum login
+        if (!currentSession.nrp) return;
+
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            showToast('Sesi berakhir karena tidak ada aktivitas selama 1 menit.', 'error');
+            logout();
+        }, INACTIVITY_LIMIT);
+    }
+
+    // Pantau berbagai bentuk interaksi pengguna
+    const activityEvents = ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'];
+    activityEvents.forEach(event => {
+        window.addEventListener(event, resetInactivityTimer, true);
+    });
+
     const ALL_ITEMS_MASTER = [
         { key: 'Baju PDL', label: 'Baju PDL' },
         { key: 'Sepatu PDL', label: 'Sepatu PDL' },
@@ -600,6 +621,9 @@
                 } else {
                     showMenu();
                 }
+
+                // Jalankan timer saat login berhasil
+                resetInactivityTimer();
             } else {
                 showToast(result.message || 'NRP atau Password salah!', 'error');
             }
@@ -624,6 +648,9 @@
             } else {
                 showMenu();
             }
+
+            // Jalankan timer saat sesi lama dimuat
+            resetInactivityTimer();
         }
     });
 
@@ -1096,6 +1123,7 @@
     }
 
     function logout() {
+        clearTimeout(inactivityTimer); // Hentikan timer saat logout
         localStorage.removeItem('kaporlap_session');
         currentSession = { nrp: "", nama: "", role: "", pangkat: "-" };
         document.getElementById('loginForm').reset();
