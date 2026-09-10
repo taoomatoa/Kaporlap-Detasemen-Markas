@@ -382,7 +382,7 @@
             <!-- MENU UTAMA -->
             <div class="menu-grid">
                 <div class="menu-item" onclick="showForm()">
-                    <div style="font-size: 1.5rem;">📋</div>
+                    <div style="font-size: 1.5rem;">📝</div>
                     <div>Input Ukuran</div>
                 </div>
                 <div class="menu-item" onclick="loadMyData()">
@@ -683,22 +683,37 @@
         }
     }
 
+    /* --- PERBAIKAN: VALIDASI SESI SAAT DOM CONTENT LOADED --- */
     window.addEventListener('DOMContentLoaded', () => {
         const savedSession = localStorage.getItem('kaporlap_session');
         
         if (savedSession) {
-            currentSession = JSON.parse(savedSession);
-            document.getElementById('userInfo').innerText = `${currentSession.nama} (${currentSession.role})`;
-            
-            hideAllPages();
-            if (currentSession.role === 'Admin') {
-                document.getElementById('adminPanel').classList.remove('hidden');
-                loadAdminData();
-            } else {
-                showMenu();
-            }
+            try {
+                currentSession = JSON.parse(savedSession);
+                
+                // Jika data nama/NRP rusak atau bernilai kosong/undefined, paksa logout
+                if (!currentSession.nrp || !currentSession.nama || currentSession.nama === "undefined" || currentSession.nama === "-") {
+                    logout();
+                    return;
+                }
 
-            resetInactivityTimer();
+                document.getElementById('userInfo').innerText = `${currentSession.nama} (${currentSession.role})`;
+                
+                hideAllPages();
+                if (currentSession.role === 'Admin') {
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    loadAdminData();
+                } else {
+                    showMenu();
+                }
+
+                resetInactivityTimer();
+            } catch (e) {
+                logout();
+            }
+        } else {
+            hideAllPages();
+            document.getElementById('loginCard').classList.remove('hidden');
         }
     });
 
@@ -1269,12 +1284,24 @@
         document.getElementById('dataPage').classList.add('hidden');
     }
 
+    /* --- PERBAIKAN: FUNGSI LOGOUT TOTAL --- */
     function logout() {
         clearTimeout(inactivityTimer);
+        
+        // Hapus penyimpanan lokal secara menyeluruh
         localStorage.removeItem('kaporlap_session');
+        localStorage.clear();
+
+        // Reset variabel global sesi
         currentSession = { nrp: "", nama: "", role: "", pangkat: "-" };
+
+        // Reset form & label UI profil
         document.getElementById('loginForm').reset();
-        document.getElementById('userInfo').innerText = 'Aplikasi Internal Denma Paspampres';
+        document.getElementById('userInfo').innerText = 'Aplikasi Internal Logistik Denma Paspampres';
+        document.getElementById('userCardNama').innerText = 'MEMUAT...';
+        document.getElementById('userCardNrp').innerText = '-';
+        document.getElementById('userCardPangkat').innerText = 'Pangkat: -';
+
         hideAllPages();
         document.getElementById('loginCard').classList.remove('hidden');
         showToast('Anda telah keluar.', 'info');
